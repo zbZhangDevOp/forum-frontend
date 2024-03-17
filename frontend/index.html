@@ -1,28 +1,95 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>LurkForWork</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- You can add your styles and scripts here -->
-    <link rel="stylesheet" type="text/css" media="screen" href="styles/global.css" />
-</head>
-<body>
-    <!-- This is an example app structure, you can modify this as much as you choose --> 
-    <header>
-        <h1>lurkforwork.com</h1>
-        <nav>
-            <li class="nav-item">Item</li>
-            <li class="nav-item">Item</li>
-        </nav>
-    </header>
-    <main role="main">
-        <!-- app goes here --> 
-    </main>
-    <footer>
-        <p>&copy; lurkforwork.com 2022</p>
-    </footer>
-    <script type="module" src="src/main.js"></script>
-</body>
-</html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>LurkForWork</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- You can add your styles and scripts here -->
+        <link
+            rel="stylesheet"
+            type="text/css"
+            media="screen"
+            href="styles/global.css"
+        >
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous"
+        >
+    </head>
+    <body>
+        <!-- This is an example app structure, you can modify this as much as you choose -->
+        <header class="p-3 text-bg-dark">
+            <div class="navigation">
+                <div>
+                    <h1>lurkforwork.com</h1>
+                </div>
+                <div class="nav" id="nav-logged-out" style="display: none">
+                    <button id="nav-register" type="button" class="btn btn-warning">Register</button>
+                    <button id="nav-login" type="button" class="btn btn-outline-light me-2">Login</button>
+                </div>
+                <div class="nav" id="nav-logged-in" style="display: none">
+                    <button id="nav-dashboard" type="button" class="btn btn-warning">Dashboard</button>
+                    <button id="nav-logout" type="button" class="btn btn-outline-light me-2">Logout</button>
+                </div>
+            </div>
+        </header>
+        <main role="main">
+            <div id="page-register" style="display: none">
+                <h2>Register</h2>
+                Email:
+                <input type="text" id="register-email" value="hello1">
+                <br>
+                Name:
+                <input type="text" id="register-name" value="hello3">
+                <br>
+                Password:
+                <input type="password" id="register-password" value="hello2">
+                <br>
+                Confirm Password:
+                <input type="password" id="register-password-confirm" value="hello2">
+                <br>
+                <button id="register-submit">Register</button>
+            </div>
+            <div id="page-login" style="display: none">
+                <h2>Login</h2>
+                Email:
+                <input type="text" id="login-email" value="hello1">
+                <br>
+                Password:
+                <input type="text" id="login-password" value="hello2">
+                <br>
+                <button id="login-submit">Login</button>
+            </div>
+            <div id="page-create-thread" style="display: none">
+                <h2>Create Thread</h2>
+                Title:
+                <input type="text" id="new-thread-title" value="123">
+                <br>
+                Public:
+                <input type="checkbox" id="new-thread-public">
+                <br>
+                Content:
+                <textarea id="new-thread-content"></textarea>
+                <br>
+                <button id="new-thread-submit">Create</button>
+            </div>
+            <div id="page-dashboard" style="display: grid">
+                <div id="threads-menu">
+                    <button id="create-thread-button">Create Thread</button>
+                    <h2>Threads</h2>
+                    <div id="dashboard-threads">
+                    </div>
+                    <button id="more-thread" type="button" class="btn btn-warning">Add More Page</button>
+                </div>
+                <div id="thread">
+                </div>
+            </main>
+            <footer>
+                <p>&copy; lurkforwork.com 2022</p>
+            </footer>
+            <script type="module" src="src/main.js"></script>
+        </body>
+    </html>
