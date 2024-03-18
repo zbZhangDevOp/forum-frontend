@@ -41,5 +41,13 @@ li {
   display: flex;
 }
 
+.comment {
+  height: 100px;
+  border: 1px solid black;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
 /* .thread-box div {
 } */

@@ -86,10 +86,59 @@
                 </div>
                 <div id="thread">
                 </div>
+
+                <div id="edit-thread-modal" class="modal" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Edit Thread</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Title:
+                            <input type="text" id="edit-thread-title">
+                            <br>
+                            Content:
+                            <textarea id="edit-thread-content"></textarea>
+                            <br>
+                            Public:
+                            <input type="checkbox" id="edit-thread-public">
+                            <br>
+                            Locked:
+                            <input type="checkbox" id="edit-thread-locked">
+                            <br>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" id="edit-thread-close" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" id="edit-thread-submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <div id="reply-modal" class="modal" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Reply</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <textarea id="reply-comment-text"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" id="reply-comment-close" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" id="reply-comment-submit" class="btn btn-primary">Comment</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
             </main>
             <footer>
                 <p>&copy; lurkforwork.com 2022</p>
             </footer>
             <script type="module" src="src/main.js"></script>
+            <script type="module" src="src/thread-menu.js"></script>
+            <script type="module" src="src/thread-display.js"></script>
+            <script type="module" src="src/comments.js"></script>
         </body>
     </html>
