@@ -2,20 +2,14 @@ import { BACKEND_PORT } from './config.js';
 import { loadPage } from './main.js';
 import { postMainComment, loadComments } from './comments.js';
 
-
-let user = null;
-
-if (localStorage.getItem('user') !== null) {
-    user = JSON.parse(localStorage.getItem('user'));
-
-}
+import { validateUser } from './main.js';
 
 export const displayThread = (id) => {
     fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
+            'Authorization': `Bearer ${validateUser.user.token}`
         }
     }).then(response => response.json())
         .then(data => {
@@ -55,9 +49,9 @@ export const displayThread = (id) => {
                 threadDiv.appendChild(deleteButton);
 
                 const likeButton = document.createElement("button");
-                likeButton.className = "btn btn-like";
+                likeButton.className = "btn btn-outline-primary";
                 likeButton.id = "like-button";
-                likeButton.innerHTML = data.likes.includes(user.userId) ? "♥ Unlike" : "♡ Like";
+                likeButton.innerHTML = data.likes.includes(validateUser.user.userId) ? "♥ Unlike" : "♡ Like";
                 likeButton.addEventListener("click", () => {
                     toggleLikeThread(data.lock, id);
                 });
@@ -66,9 +60,9 @@ export const displayThread = (id) => {
 
 
                 const watchButton = document.createElement("button");
-                watchButton.className = "btn btn-watch";
+                watchButton.className = "btn btn-outline-primary";
                 watchButton.id = "watch-button";
-                watchButton.innerHTML = data.watchees.includes(user.userId) ? "❌ Unwatch" : "👁 Watch";
+                watchButton.innerHTML = data.watchees.includes(validateUser.user.userId) ? "❌ Unwatch" : "👁 Watch";
                 watchButton.addEventListener("click", () => {
                     toggleWatchThread(id);
                 });
@@ -98,7 +92,7 @@ const openEditThreadModal = (id) => {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
+            'Authorization': `Bearer ${validateUser.user.token}`
         }
     }).then(response => response.json())
         .then(data => {
@@ -135,7 +129,7 @@ const saveThreadChanges = (id) => {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
+            'Authorization': `Bearer ${validateUser.user.token}`
         },
         body: JSON.stringify(updatedData)
     }).then(response => response.json())
@@ -159,7 +153,7 @@ const deleteThread = (id) => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
+                'Authorization': `Bearer ${validateUser.user.token}`
             },
             body: JSON.stringify(deleteData)
         }).then(response => response.json())
@@ -179,14 +173,14 @@ const isThreadLiked = (id) => {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
+            'Authorization': `Bearer ${validateUser.user.token}`
         }
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
                 alert(data.error);
             } else {
-                return data.likes.includes(user.userId);
+                return data.likes.includes(validateUser.user.userId);
             }
         });
 }
@@ -207,7 +201,7 @@ const toggleLikeThread = (isLocked, id) => {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
+                'Authorization': `Bearer ${validateUser.user.token}`
             },
             body: JSON.stringify(likeThread)
         })
@@ -231,14 +225,14 @@ const isThreadWatched = (id) => {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
+            'Authorization': `Bearer ${validateUser.user.token}`
         }
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
                 alert(data.error);
             } else {
-                return data.watchees.includes(user.userId);
+                return data.watchees.includes(validateUser.user.userId);
             }
         });
 }
@@ -254,7 +248,7 @@ const toggleWatchThread = (id) => {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
+                'Authorization': `Bearer ${validateUser.user.token}`
             },
             body: JSON.stringify(likeThread)
         })

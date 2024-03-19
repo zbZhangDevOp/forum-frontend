@@ -3,11 +3,23 @@ import { BACKEND_PORT } from './config.js';
 import { fileToDataUrl } from './helpers.js';
 import { threadManager } from './thread-menu.js';
 
-let user = null;
-
-if (localStorage.getItem('user') !== null) {
-    user = JSON.parse(localStorage.getItem('user'));
+export const validateUser = {
+    user: null,
+    loadUser: function () {
+        if (localStorage.getItem('user') !== null) {
+            this.user = JSON.parse(localStorage.getItem('user'));
+        }
+    },
+    setUser: function (data) {
+        localStorage.setItem('user', JSON.stringify(data));
+        this.loadUser();
+    },
+    reset: function () {
+        this.user = null;
+        localStorage.clear()
+    }
 }
+
 
 const pages = ["page-login", "page-register", "page-dashboard", "page-create-thread"];
 
@@ -24,7 +36,7 @@ export const loadPage = (page) => {
 }
 
 const loadNav = () => {
-    if (user) {
+    if (validateUser.user) {
         document.getElementById("nav-logged-out").style.display = "none";
         document.getElementById("nav-logged-in").style.display = "block";
     } else {
@@ -34,7 +46,10 @@ const loadNav = () => {
 }
 
 const onLoad = () => {
-    if (user !== null) {
+    validateUser.loadUser();
+    loadNav();
+
+    if (validateUser.user !== null) {
         loadPage("page-dashboard");
     } else {
         loadPage("page-login");
@@ -69,10 +84,8 @@ document.getElementById("register-submit").addEventListener("click", () => {
             if (data.error) {
                 alert(data.error);
             } else {
-                localStorage.setItem('user', JSON.stringify(data));
-                user = localStorage.getItem('user');
-                loadNav();
-                loadPage("page-dashboard");
+                validateUser.setUser(data);
+                onLoad();
             }
         });
 })
@@ -96,10 +109,9 @@ document.getElementById("login-submit").addEventListener("click", () => {
             if (data.error) {
                 alert(data.error);
             } else {
-                localStorage.setItem('user', JSON.stringify(data));
-                user = localStorage.getItem('user');
-                loadNav();
-                loadPage("page-dashboard");
+                validateUser.setUser(data);
+                onLoad();
+
             }
         });
 })
@@ -114,12 +126,9 @@ document.getElementById("nav-login").addEventListener("click", () => {
 })
 
 document.getElementById("nav-logout").addEventListener("click", () => {
-    localStorage.clear()
-    user = null;
-    loadNav();
-    loadPage("page-login");
+    validateUser.reset();
+    onLoad();
 })
 
 onLoad();
-loadNav();
 

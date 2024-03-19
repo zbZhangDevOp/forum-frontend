@@ -1,13 +1,8 @@
 import { BACKEND_PORT } from './config.js';
 import { displayThread } from './thread-display.js';
 
-
-let user = null;
-
-if (localStorage.getItem('user') !== null) {
-    user = JSON.parse(localStorage.getItem('user'));
-
-}
+import { validateUser } from './main.js';
+import { loadPage } from './main.js';
 
 export const threadManager = {
     threadNumber: 0,
@@ -17,7 +12,7 @@ export const threadManager = {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
+                'Authorization': `Bearer ${validateUser.user.token}`
             }
         }).then(response => response.json())
             .then(data => {
@@ -41,7 +36,7 @@ export const threadManager = {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
+                'Authorization': `Bearer ${validateUser.user.token}`
             }
         }).then(response => response.json())
             .then(data => {
@@ -50,7 +45,7 @@ export const threadManager = {
                 } else {
                     const threadLink = document.createElement("a");
                     threadLink.href = "#";
-                    threadLink.className = "thread-box";
+                    threadLink.className = "list-group-item list-group-item-action";
 
                     // Add thread title
                     const title = document.createElement("h4");
@@ -111,7 +106,7 @@ document.getElementById("new-thread-submit").addEventListener("click", () => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
+            'Authorization': `Bearer ${validateUser.user.token}`
         },
         body: JSON.stringify(data)
     }).then(response => response.json())
