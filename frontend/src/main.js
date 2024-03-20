@@ -1,6 +1,5 @@
 import { BACKEND_PORT } from './config.js';
 // A helper you may want to use when uploading new images to the server.
-import { fileToDataUrl } from './helpers.js';
 import { threadManager } from './thread-menu.js';
 
 export const validateUser = {
@@ -30,7 +29,11 @@ export const loadPage = (page) => {
     document.getElementById(page).style.display = "block";
     if (page === "page-dashboard") {
         threadManager.reset();
-        threadManager.loadThreads();
+
+        threadManager.loadThreads(() => {
+            threadManager.loadThreads(() => { threadManager.loadThreads(); }); // Call the second time after the first call is complete
+        });
+
         document.getElementById(page).style.display = "grid";
     }
 }
@@ -38,9 +41,9 @@ export const loadPage = (page) => {
 const loadNav = () => {
     if (validateUser.user) {
         document.getElementById("nav-logged-out").style.display = "none";
-        document.getElementById("nav-logged-in").style.display = "block";
+        document.getElementById("nav-logged-in").style.display = "flex";
     } else {
-        document.getElementById("nav-logged-out").style.display = "block";
+        document.getElementById("nav-logged-out").style.display = "flex";
         document.getElementById("nav-logged-in").style.display = "none";
     }
 }
@@ -57,7 +60,6 @@ const onLoad = () => {
 }
 
 document.getElementById("register-submit").addEventListener("click", () => {
-    const name = document.getElementById("register-name").value;
     const password = document.getElementById("register-password").value;
     const email = document.getElementById("register-email").value;
     const password_confirm = document.getElementById("register-password-confirm").value;
@@ -121,7 +123,6 @@ document.getElementById("nav-register").addEventListener("click", () => {
 })
 
 document.getElementById("nav-login").addEventListener("click", () => {
-
     loadPage("page-login");
 })
 
@@ -130,5 +131,14 @@ document.getElementById("nav-logout").addEventListener("click", () => {
     onLoad();
 })
 
+document.getElementById("dashboard-threads").addEventListener("scroll", () => {
+    let div = document.getElementById("dashboard-threads");
+    let scrollTop = div.scrollTop;
+    let scrollHeight = div.scrollHeight;
+    let clientHeight = div.clientHeight;
+    if (clientHeight + scrollTop >= scrollHeight - 50) {
+        threadManager.loadThreads();
+    }
+})
 onLoad();
 

@@ -4,11 +4,15 @@ import { displayThread } from './thread-display.js';
 import { validateUser } from './main.js';
 import { loadPage } from './main.js';
 
+import { getUserName } from './user.js';
+import { formatTimeSince } from './helpers.js';
+
 export const threadManager = {
     threadNumber: 0,
 
-    loadThreads: function () {
-        fetch(`http://localhost:${BACKEND_PORT}/threads?start=${this.threadNumber}`, {
+
+    loadThreads: function (callback) {
+        return fetch(`http://localhost:${BACKEND_PORT}/threads?start=${this.threadNumber}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -19,20 +23,36 @@ export const threadManager = {
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    const threadPromises = data.map(threadId => this.loadThread(threadId));
-                    Promise.all(threadPromises).then(() => {
+                    let promiseChain = Promise.resolve();
+
+                    data.forEach(threadId => {
+                        promiseChain = promiseChain.then(() => this.loadThread(threadId));
+                    });
+
+
+                    console.log(this.threadNumber);
+
+
+                    promiseChain.then(() => {
                         if (this.threadNumber === 0 && data.length > 0) {
                             displayThread(data[0]);
                         }
                         console.log("All threads loaded");
+                        console.log(this.threadNumber);
                         this.threadNumber += data.length;
+                        if (callback) {
+                            callback();
+                        }
+                        console.log(this.threadNumber);
+
                     });
+                    return data.length;
                 }
             });
     },
 
     loadThread: function (id) {
-        fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+        return fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,42 +63,52 @@ export const threadManager = {
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    const threadLink = document.createElement("a");
-                    threadLink.href = "#";
-                    threadLink.className = "list-group-item list-group-item-action";
+                    return getUserName(data.creatorId).then((name) => {
+                        const threadLink = document.createElement("a");
+                        threadLink.href = "#";
+                        threadLink.className = "list-group-item list-group-item-action thread-link";
 
-                    // Add thread title
-                    const title = document.createElement("h4");
-                    title.innerText = data.title;
-                    threadLink.appendChild(title);
+                        // Add thread title
+                        const title = document.createElement("h4");
+                        title.innerText = data.title;
+                        threadLink.appendChild(title);
 
-                    // Add post date
-                    const postDate = document.createElement("p");
-                    postDate.innerText = `Date: ${data.createdAt}`;
-                    threadLink.appendChild(postDate);
+                        const threadLinkComponents = document.createElement("div");
+                        threadLinkComponents.className = "thread-link-components";
 
-                    // Add author
-                    const author = document.createElement("p");
-                    author.innerText = `Author: ${data.creatorId}`;
-                    threadLink.appendChild(author);
 
-                    // Add number of likes
-                    const likes = document.createElement("p");
-                    likes.innerText = `Likes: ${data.likes}`;
-                    threadLink.appendChild(likes);
 
-                    // Append the thread div to the dashboard
-                    document.getElementById("dashboard-threads").appendChild(threadLink);
+                        // Add author
+                        const author = document.createElement("p");
+                        author.innerText = `${name}`;
+                        threadLinkComponents.appendChild(author);
 
-                    threadLink.addEventListener("click", (e) => {
-                        displayThread(id);
-                    });
+                        // Add post date
+                        const postDate = document.createElement("p");
+                        postDate.innerText = `${formatTimeSince(data.createdAt)}`;
+                        threadLinkComponents.appendChild(postDate);
+
+                        // Add number of likes
+                        const likes = document.createElement("p");
+                        likes.innerText = `Likes: ${data.likes.length}`;
+                        threadLinkComponents.appendChild(likes);
+
+                        threadLink.appendChild(threadLinkComponents);
+
+                        // Append the thread div to the dashboard
+                        document.getElementById("dashboard-threads").appendChild(threadLink);
+
+                        threadLink.addEventListener("click", (e) => {
+                            displayThread(id);
+                        });
+                    })
                 }
-            });
+            })
     },
 
     reset: function () {
         this.threadNumber = 0;
+        this.initialLoadCount = 0;
         document.getElementById("dashboard-threads").innerText = "";
     }
 };
@@ -117,9 +147,4 @@ document.getElementById("new-thread-submit").addEventListener("click", () => {
                 loadPage("page-dashboard");
             }
         });
-});
-
-document.getElementById("more-thread").addEventListener("click", () => {
-    threadManager.loadThreads();
-
 });

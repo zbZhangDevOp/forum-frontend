@@ -141,7 +141,6 @@ const loadUserThread = (threadId) => {
 
 const loadUserInfo = (userId) => {
     document.getElementById("user-info").innerText = "";
-    console.log("???")
     fetch(`http://localhost:${BACKEND_PORT}/user?userId=${userId}`, {
         method: 'GET',
         headers: {
@@ -173,6 +172,26 @@ const loadUserInfo = (userId) => {
                 const isAdmin = document.createElement("p");
                 isAdmin.innerText = `Admin: ${data.admin}`;
                 userInfo.appendChild(isAdmin);
+            }
+        });
+}
+
+export const getUserName = (userId) => {
+    return fetch(`http://localhost:${BACKEND_PORT}/comments?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${validateUser.user.token}`
+        }
+    }).then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                if (!data.name) {
+                    return "New User";
+                }
+                return data.name;
             }
         });
 }

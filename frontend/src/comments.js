@@ -1,7 +1,7 @@
 import { BACKEND_PORT } from './config.js';
-import { displayThread } from './thread-display.js';
 import { validateUser } from './main.js';
 import { getUserImg, openUserModal } from './user.js';
+import { formatTimeSince } from './helpers.js';
 
 let user = null;
 
@@ -22,7 +22,13 @@ export const loadComments = (threadId) => {
             if (data.error) {
                 alert(data.error);
             } else {
-                document.getElementById("comments-container").innerText = "";
+                const commentsContainer = document.getElementById("comments-container");
+                commentsContainer.innerText = "";
+
+                const commentTitle = document.createElement("h3");
+                commentTitle.innerText = "Comments";
+                commentsContainer.appendChild(commentTitle);
+
                 displayComments(data, null);
             }
         });
@@ -65,12 +71,6 @@ const displayComments = (comments, parentId) => {
                 openUserModal(comment.creatorId, comment.threadId);
             };
 
-            // Add time since commented
-            // const timeSince = document.createElement("p");
-            // timeSince.innerText = formatTimeSince(comment.createdAt);
-            // commentHeading.appendChild(timeSince);
-
-            console.log(comment)
             // Add number of likes
             const numLikes = document.createElement("p");
             numLikes.innerText = `${formatTimeSince(comment.createdAt)} | Likes: ${comment.likes.length}`;
@@ -81,13 +81,17 @@ const displayComments = (comments, parentId) => {
 
             // Add comment content
             const content = document.createElement("p");
+            content.className = "comment-content";
             content.innerText = comment.content;
             commentBody.appendChild(content);
+
+            const contentModify = document.createElement("div");
+            contentModify.className = "btn-group content-modify";
 
             // Add number of likes
 
             const likeButton = document.createElement("button");
-            likeButton.className = "btn btn-outline-primary";
+            likeButton.className = "btn btn-light";
             likeButton.id = `like-comment-${comment.id}`;
 
             likeButton.innerHTML = comment.likes.includes(validateUser.user.userId) ? "♥ Unlike" : "♡ Like";
@@ -95,23 +99,25 @@ const displayComments = (comments, parentId) => {
                 toggleLikeComment(comment.id, comment.threadId);
             });
 
-            commentBody.appendChild(likeButton);
+            contentModify.appendChild(likeButton);
 
             const replyButton = document.createElement("button");
             replyButton.innerText = "Reply";
-            replyButton.className = "btn btn-primary";
+            replyButton.className = "btn btn-light";
             replyButton.addEventListener("click", () => {
                 openReplyModal(comment.id, comment.threadId);
             });
-            commentBody.appendChild(replyButton);
+            contentModify.appendChild(replyButton);
 
             const editButton = document.createElement("button");
             editButton.innerText = "Edit";
-            editButton.className = "btn btn-outline-primary";
+            editButton.className = "btn btn-light";
             editButton.addEventListener("click", () => {
                 openEditCommentModal(comment.id, comment.content, comment.threadId);
             });
-            commentBody.appendChild(editButton);
+            contentModify.appendChild(editButton);
+
+            commentBody.appendChild(contentModify);
 
             // Add nested comments container
             const nestedComments = document.createElement("div");
@@ -205,23 +211,7 @@ const replyComment = (parentId, threadId) => {
         });
 };
 
-const formatTimeSince = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 60) {
-        return "Just now";
-    } else if (diffInSeconds < 3600) {
-        return `${Math.floor(diffInSeconds / 60)} minute(s) ago`;
-    } else if (diffInSeconds < 86400) {
-        return `${Math.floor(diffInSeconds / 3600)} hour(s) ago`;
-    } else if (diffInSeconds < 604800) {
-        return `${Math.floor(diffInSeconds / 86400)} day(s) ago`;
-    } else {
-        return `${Math.floor(diffInSeconds / 604800)} week(s) ago`;
-    }
-};
 
 const openEditCommentModal = (commentId, commentText, threadId) => {
     document.getElementById("edit-comment-modal").style.display = "block";

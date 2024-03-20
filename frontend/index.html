@@ -30,26 +30,24 @@
           <div id="nav-logged-out" style="display: none">
             <div class="collapse navbar-collapse">
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <div>
-                  <li class="nav-item">
-                    <button
-                      id="nav-register"
-                      type="button"
-                      class="btn btn-warning"
-                    >
-                      Register
-                    </button>
-                  </li>
-                  <li class="nav-item">
-                    <button
-                      id="nav-login"
-                      type="button"
-                      class="btn btn-outline-light me-2"
-                    >
-                      Login
-                    </button>
-                  </li>
-                </div>
+                <li class="nav-item">
+                  <button
+                    id="nav-register"
+                    type="button"
+                    class="btn btn-primary"
+                  >
+                    Register
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button
+                    id="nav-login"
+                    type="button"
+                    class="btn btn-outline-light me-2"
+                  >
+                    Login
+                  </button>
+                </li>
               </ul>
             </div>
           </div>
@@ -66,7 +64,7 @@
                   </button>
                 </li>
                 <li class="nav-item">
-                  <button id="nav-logout" type="button" class="btn btn-warning">
+                  <button id="nav-logout" type="button" class="btn btn-danger">
                     Logout
                   </button>
                 </li>
@@ -76,59 +74,85 @@
               </ul>
             </div>
           </div>
-          <!-- <div class="nav" id="nav-logged-out" style="display: none">
-            <button id="nav-register" type="button" class="btn btn-warning">
-              Register
-            </button>
-            <button
-              id="nav-login"
-              type="button"
-              class="btn btn-outline-light me-2"
-            >
-              Login
-            </button>
-          </div> -->
-          <!-- <div class="nav" id="nav-logged-in" style="display: none">
-            <button id="nav-dashboard" type="button" class="btn btn-warning">
-              Dashboard
-            </button>
-            <button
-              id="nav-logout"
-              type="button"
-              class="btn btn-outline-light me-2"
-            >
-              Logout
-            </button>
-          </div> -->
         </div>
       </nav>
     </header>
     <main role="main">
       <div id="page-register" style="display: none">
-        <h2>Register</h2>
-        Email:
-        <input type="text" id="register-email" value="hello1" />
-        <br />
-        Name:
-        <input type="text" id="register-name" value="hello3" />
-        <br />
-        Password:
-        <input type="password" id="register-password" value="hello2" />
-        <br />
-        Confirm Password:
-        <input type="password" id="register-password-confirm" value="hello2" />
-        <br />
-        <button id="register-submit">Register</button>
+        <form>
+          <h1 class="h3 mb-3 fw-normal">Register</h1>
+
+          <div class="form-floating mb-3">
+            <input
+              type="email"
+              class="form-control"
+              placeholder="name@example.com"
+              id="register-email"
+              value="hello1@gmail.com"
+            />
+            <label for="register-email">Email address</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              class="form-control"
+              placeholder="Password"
+              type="password"
+              id="register-password"
+              value="hello2"
+            />
+            <label for="register-password">Password</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              class="form-control"
+              placeholder="Password"
+              type="password"
+              id="register-password-confirm"
+              value="hello2"
+            />
+            <label for="register-password-confirm">Confirm Password</label>
+          </div>
+          <br />
+          <button
+            class="btn btn-primary py-2"
+            type="submit"
+            id="register-submit"
+          >
+            Register
+          </button>
+          <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>
+        </form>
       </div>
       <div id="page-login" style="display: none">
-        <h2>Login</h2>
-        Email:
-        <input type="text" id="login-email" value="hello1" />
-        <br />
-        Password:
-        <input type="text" id="login-password" value="hello2" />
-        <br />
-        <button id="login-submit">Login</button>
+        <form>
+          <h1 class="h3 mb-3 fw-normal">Login</h1>
+
+          <div class="form-floating mb-3">
+            <input
+              type="email"
+              class="form-control"
+              placeholder="name@example.com"
+              id="login-email"
+              value="hello1@gmail.com"
+            />
+            <label for="login-email">Email address</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              class="form-control"
+              placeholder="Password"
+              type="password"
+              id="login-password"
+              value="hello2"
+            />
+            <label for="login-password">Password</label>
+          </div>
+          <br />
+          <button class="btn btn-primary py-2" type="submit" id="login-submit">
+            Login
+          </button>
+          <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>
+        </form>
       </div>
       <div id="page-create-thread" style="display: none">
         <h2>Create Thread</h2>
@@ -149,9 +173,6 @@
             Create Thread
           </button>
           <div id="dashboard-threads" class="list-group"></div>
-          <button id="more-thread" type="button" class="btn btn-warning">
-            Add More Page
-          </button>
         </div>
         <div id="thread"></div>
 
@@ -296,13 +317,6 @@
                 >
                   Close
                 </button>
-                <!-- <button
-                  type="button"
-                  id="edit-comment-submit"
-                  class="btn btn-primary"
-                >
-                  Comment
-                </button> -->
               </div>
             </div>
           </div>

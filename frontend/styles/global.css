@@ -5,6 +5,11 @@ body {
   padding: 0;
   height: 100%;
   font-family: Arial;
+  overflow-y: hidden;
+}
+
+main {
+  height: 100%;
 }
 
 li {
@@ -19,46 +24,97 @@ nav h1 {
   color: white;
 }
 
-/* .navigation {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 20px;
-} */
+main {
+  position: relative;
+  height: 100vh; /* or any specific height */
+}
+
+#page-register {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+}
+
+#page-register button {
+  float: right;
+}
+
+#page-login {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+}
+
+#page-login button {
+  float: right;
+}
 
 #page-dashboard {
   display: inline;
-  grid-template-columns: 400px 80%;
+  grid-template-columns: 400px auto;
   grid-template-areas: "threads thread";
 }
 
 #threads-menu {
   grid-area: threads;
+  overflow-y: auto;
+}
+
+#create-thread-button {
+  margin: 15px 0;
+  margin-left: 50%;
+  width: 50%;
+  justify-content: center;
+}
+
+#dashboard-threads {
+  max-height: 90vh;
+  overflow-y: scroll; /* Makes the div scrollable */
+}
+
+.thread-link {
+  height: 100px;
+  display: flex;
+  padding: 15px !important;
+}
+
+.thread-link-components {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 #thread {
   grid-area: thread;
   display: flex;
   flex-direction: column;
+  padding: 50px;
 }
 
-.thread-box {
-  height: 100px;
-  border: 1px solid black;
-  margin-bottom: 10px;
-  display: flex;
-}
-
-/* .comment {
-  height: 100px;
-  border: 1px solid black;
-  margin-bottom: 10px;
+#thread-head {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#thread-modify {
+  float: right;
+  width: 100px;
+}
+
+/* #thread-head-components {
+  display: flex;
+  gap: 20px;
 } */
 
 #comments-container {
-  padding: 40px;
+  margin-bottom: 50px;
+  margin-top: 50px;
 }
 
 .comment-border-link {
@@ -74,15 +130,26 @@ nav h1 {
   background-clip: padding-box;
 }
 
+#new-comment-submit {
+  margin-top: 20px;
+  float: right;
+}
+
 .comment {
   position: relative;
   margin-top: 20px;
 }
+
 .comment-heading {
   display: flex;
   align-items: center;
   height: 70px;
   font-size: 14px;
+}
+
+.comment-content {
+  padding: 20px;
+  border-radius: 5px;
 }
 
 .nested-comments {
@@ -97,7 +164,7 @@ nav h1 {
   top: 70px;
   left: 0;
   width: 12px;
-  height: calc(100% - 50px);
+  height: calc(100% - 70px);
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   background-color: rgba(0, 0, 0, 0.1);
@@ -125,4 +192,10 @@ nav h1 {
   gap: 20px;
   align-items: center;
   justify-items: space-between;
+}
+
+button {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
 }

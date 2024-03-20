@@ -4,6 +4,8 @@ import { postMainComment, loadComments } from './comments.js';
 
 import { validateUser } from './main.js';
 
+import { formatTimeSince } from './helpers.js';
+
 export const displayThread = (id) => {
     fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
         method: 'GET',
@@ -19,69 +21,120 @@ export const displayThread = (id) => {
                 const threadDiv = document.getElementById("thread");
                 threadDiv.innerText = "";
 
+                const threadHead = document.createElement("div");
+                threadHead.id = "thread-head";
+
+                const threadHeadComponents = document.createElement("div");
+                threadHeadComponents.id = "thread-head-components";
+                threadHeadComponents.className = "btn-group";
+
                 const title = document.createElement("h1");
                 title.innerText = data.title;
-                threadDiv.appendChild(title);
-
-                const content = document.createElement("p");
-                content.innerText = `Content: ${data.content}`;
-                threadDiv.appendChild(content);
-
-                const likes = document.createElement("p");
-                likes.innerText = `Likes: ${data.likes}`;
-                threadDiv.appendChild(likes);
-
-                const editButton = document.createElement("button");
-                editButton.innerText = "Edit";
-                editButton.className = "btn btn-primary";
-                editButton.addEventListener("click", () => {
-                    openEditThreadModal(id);
-                });
-                threadDiv.appendChild(editButton);
-
-
-                const deleteButton = document.createElement("button");
-                deleteButton.innerText = "Delete";
-                deleteButton.className = "btn btn-danger";
-                deleteButton.addEventListener("click", () => {
-                    deleteThread(id);
-                });
-                threadDiv.appendChild(deleteButton);
+                threadHead.appendChild(title);
 
                 const likeButton = document.createElement("button");
-                likeButton.className = "btn btn-outline-primary";
+                likeButton.className = "btn btn-light";
                 likeButton.id = "like-button";
                 likeButton.innerHTML = data.likes.includes(validateUser.user.userId) ? "♥ Unlike" : "♡ Like";
                 likeButton.addEventListener("click", () => {
                     toggleLikeThread(data.lock, id);
                 });
 
-                threadDiv.appendChild(likeButton);
+                threadHeadComponents.appendChild(likeButton);
 
 
                 const watchButton = document.createElement("button");
-                watchButton.className = "btn btn-outline-primary";
+                watchButton.className = "btn btn-light";
                 watchButton.id = "watch-button";
-                watchButton.innerHTML = data.watchees.includes(validateUser.user.userId) ? "❌ Unwatch" : "👁 Watch";
+                watchButton.innerHTML = data.watchees.includes(validateUser.user.userId) ? "★ Unwatch" : "☆ Watch";
                 watchButton.addEventListener("click", () => {
                     toggleWatchThread(id);
                 });
-                threadDiv.appendChild(watchButton);
+                threadHeadComponents.appendChild(watchButton);
+
+
+
+
+                threadHead.appendChild(threadHeadComponents);
+
+                threadDiv.appendChild(threadHead);
+
+                const likes = document.createElement("p");
+                likes.className = "text-body-secondary";
+                likes.innerText = `${formatTimeSince(data.createdAt)} | Likes: ${data.likes.length}`;
+                threadDiv.appendChild(likes);
+
+
+                const content = document.createElement("p");
+                content.innerText = `${data.content}`;
+                content.className = "fs-5 comment-content";
+                threadDiv.appendChild(content);
+
+
+                const threadModify = document.createElement("div");
+                threadModify.id = "thread-modify";
+                threadModify.className = "btn-group";
+
+                const editButton = document.createElement("button");
+                editButton.innerText = "Edit";
+                editButton.className = "btn btn-light btn-sm";
+                editButton.addEventListener("click", () => {
+                    openEditThreadModal(id);
+                });
+                threadModify.appendChild(editButton);
+
+
+                const deleteButton = document.createElement("button");
+                deleteButton.innerText = "Delete";
+                deleteButton.className = "btn btn-light btn-sm";
+                deleteButton.addEventListener("click", () => {
+                    deleteThread(id);
+                });
+                threadModify.appendChild(deleteButton);
+
+                threadDiv.appendChild(threadModify);
+
+
+
+                const commentDiv = document.createElement("div");
+                commentDiv.id = "comments-container";
+
+
+                threadDiv.appendChild(commentDiv);
+
+
+
+                const newComment = document.createElement("div");
+                newComment.id = "new-comment";
+                newComment.className = "form-floating";
 
                 const newCommentText = document.createElement("textarea");
                 newCommentText.id = "new-comment-text";
+                newCommentText.className = "form-control";
+                newCommentText.placeholder = "New Comment";
+
+                const newCommentLabel = document.createElement("label");
+                newCommentLabel.innerText = "New Comment";
+                newCommentLabel.for = "new-comment-text";
+
                 const newCommentSubmit = document.createElement("button");
                 newCommentSubmit.id = "new-comment-submit";
                 newCommentSubmit.innerText = "Submit";
-                threadDiv.appendChild(newCommentText);
-                threadDiv.appendChild(newCommentSubmit);
+                newCommentSubmit.className = "btn btn-primary";
+
+                newComment.appendChild(newCommentText);
+                newComment.appendChild(newCommentLabel);
+                newComment.appendChild(newCommentSubmit);
+
                 newCommentSubmit.addEventListener("click", () => {
                     postMainComment(id);
                 });
 
-                const commentDiv = document.createElement("div");
-                commentDiv.id = "comments-container";
-                threadDiv.appendChild(commentDiv);
+                threadDiv.appendChild(newComment);
+
+
+
+
                 loadComments(id);
             }
         });
@@ -258,7 +311,7 @@ const toggleWatchThread = (id) => {
                     alert(data.error);
                 } else {
                     const watchButton = document.getElementById("watch-button");
-                    watchButton.innerHTML = !isWatching ? "❌ Unwatch" : "👁 Watch";
+                    watchButton.innerHTML = !isWatching ? "★ Unwatch" : "☆ Watch";
                 }
             })
             .catch(error => {
