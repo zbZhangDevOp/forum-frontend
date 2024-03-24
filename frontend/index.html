@@ -58,7 +58,7 @@
                   <button
                     id="nav-dashboard"
                     type="button"
-                    class="btn btn-outline-light me-2"
+                    class="btn btn-secondary me-2"
                   >
                     Dashboard
                   </button>
@@ -69,7 +69,15 @@
                   </button>
                 </li>
                 <li class="nav-item">
-                  <img src="asset/default.jpg" class="profile-pic" />
+                  <div class="dropdown-center">
+                    <button class="btn btn-secondary dropdown-toggle" id="user-dropdown-btn" type="button" aria-expanded="false">
+                      User Information
+                    </button>
+                    <ul class="dropdown-menu" id="user-dropdown">
+                      <li><a class="dropdown-item" href="#" id="current-user-info">Info</a></li>
+                      <li><a class="dropdown-item" href="#" id="update-user-info">Settings</a></li>
+                    </ul>
+                  </div>
                 </li>
               </ul>
             </div>
@@ -78,7 +86,7 @@
       </nav>
     </header>
     <main role="main">
-      <div id="page-register" style="display: none">
+      <div id="page-register" style="display: none" class="form-input">
         <form>
           <h1 class="h3 mb-3 fw-normal">Register</h1>
 
@@ -95,6 +103,15 @@
           <div class="form-floating mb-3">
             <input
               class="form-control"
+              type="name"
+              id="register-name"
+              value="hello2"
+            />
+            <label for="register-name">Name</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              class="form-control"
               placeholder="Password"
               type="password"
               id="register-password"
@@ -102,6 +119,7 @@
             />
             <label for="register-password">Password</label>
           </div>
+
           <div class="form-floating mb-3">
             <input
               class="form-control"
@@ -123,7 +141,7 @@
           <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>
         </form>
       </div>
-      <div id="page-login" style="display: none">
+      <div id="page-login" style="display: none" class="form-input">
         <form>
           <h1 class="h3 mb-3 fw-normal">Login</h1>
 
@@ -154,18 +172,96 @@
           <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>
         </form>
       </div>
-      <div id="page-create-thread" style="display: none">
-        <h2>Create Thread</h2>
-        Title:
-        <input type="text" id="new-thread-title" value="123" />
-        <br />
-        Public:
-        <input type="checkbox" id="new-thread-public" />
-        <br />
-        Content:
-        <textarea id="new-thread-content"></textarea>
-        <br />
-        <button id="new-thread-submit">Create</button>
+      <div id="page-create-thread" style="display: none" class="form-input">
+        <form>
+          <h1 class="h3 mb-3 fw-normal">Create Thread</h1>
+
+          <div class="form-floating mb-3">
+            <input
+              type="email"
+              class="form-control"
+              placeholder="name@example.com"
+              id="new-thread-title"
+              value="123"
+            />
+            <label for="new-thread-title">Title</label>
+          </div>
+          <div class="form-floating mb-3">
+            <textarea
+              class="form-control"
+              placeholder="Contents"
+              id="new-thread-content"
+              style="height: 100px"
+              value="hello2"
+            ></textarea>
+            <label for="new-thread-content">Content</label>
+          </div>
+          <div class="form-floating mb-3">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="new-thread-public"
+              />
+              <label class="form-check-label" for="new-thread-public"
+                >Private</label
+              >
+            </div>
+          </div>
+          <br />
+          <button
+            class="btn btn-primary py-2"
+            type="submit"
+            id="new-thread-submit"
+          >
+            Create
+          </button>
+        </form>
+      </div>
+      <div id="page-user-settings" style="display: none" class="form-input">
+        <form>
+          <h1 class="h3 mb-3 fw-normal">Update User Informations</h1>
+
+          <div class="form-floating mb-3">
+            <input
+              type="email"
+              class="form-control"
+              id="update-user-email"
+            />
+            <label for="update-user-email">Email</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="password"
+              class="form-control"
+              id="update-user-password"
+            />
+            <label for="update-user-password">Password</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="update-user-name"
+            />
+            <label for="update-user-name">Name</label>
+          </div>
+          <div class="form-floating mb-3">
+            <div class="mb-3">
+              <label for="update-user-image" class="form-label">Default file input example</label>
+              <input class="form-control" type="file" id="update-user-image">
+            </div>
+          </div>
+          <br />
+          <button
+            class="btn btn-primary py-2"
+            type="submit"
+            id="update-user-submit"
+          >
+            Update Settings
+          </button>
+        </form>
       </div>
       <div id="page-dashboard" style="display: grid">
         <div id="threads-menu">
@@ -186,21 +282,60 @@
                   class="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="edit-thread-cross"
                 ></button>
               </div>
               <div class="modal-body">
-                Title:
-                <input type="text" id="edit-thread-title" />
+                <div class="form-floating mb-3">
+                  <input
+                    type="email"
+                    class="form-control"
+                    placeholder="name@example.com"
+                    id="edit-thread-title"
+                  />
+                  <label for="edit-thread-title">Title</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                  <textarea
+                    class="form-control"
+                    placeholder="Contents"
+                    id="edit-thread-content"
+                    style="height: 100px"
+                  ></textarea>
+                  <label for="edit-thread-content">Content</label>
+                </div>
                 <br />
-                Content:
-                <textarea id="edit-thread-content"></textarea>
+
+                <div class="form-floating mb-3">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="edit-thread-public"
+                    />
+                    <label class="form-check-label" for="edit-thread-public"
+                      >Private</label
+                    >
+                  </div>
+
+                <div class="form-floating mb-3">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="edit-thread-locked"
+                    />
+                    <label class="form-check-label" for="edit-thread-locked"
+                      >Locked</label
+                    >
+                  </div>
+                </div>
                 <br />
-                Public:
-                <input type="checkbox" id="edit-thread-public" />
-                <br />
-                Locked:
-                <input type="checkbox" id="edit-thread-locked" />
-                <br />
+              </form>
+            </div>
               </div>
               <div class="modal-footer">
                 <button
@@ -226,16 +361,26 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title">Reply</h5>
+                <h5 class="modal-title">Reply To Comment</h5>
                 <button
                   type="button"
                   class="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="reply-comment-cross"
+
                 ></button>
               </div>
               <div class="modal-body">
-                <textarea id="reply-comment-text"></textarea>
+                <div class="form-floating mb-3">
+                  <textarea
+                    class="form-control"
+                    placeholder="Comments"
+                    id="reply-comment-text"
+                    style="height: 100px"
+                  ></textarea>
+                  <label for="reply-comment-text">Comments</label>
+                </div>
               </div>
               <div class="modal-footer">
                 <button
@@ -267,10 +412,19 @@
                   class="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="edit-comment-cross"
                 ></button>
               </div>
               <div class="modal-body">
-                <textarea id="edit-comment-text"></textarea>
+                <div class="form-floating mb-3">
+                  <textarea
+                    class="form-control"
+                    placeholder="Comments"
+                    id="edit-comment-text"
+                    style="height: 100px"
+                  ></textarea>
+                  <label for="edit-comment-text">Comments</label>
+                </div>
               </div>
               <div class="modal-footer">
                 <button
@@ -286,7 +440,7 @@
                   id="edit-comment-submit"
                   class="btn btn-primary"
                 >
-                  Comment
+                  Submit
                 </button>
               </div>
             </div>
@@ -302,6 +456,7 @@
                   class="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="display-user-cross"
                 ></button>
               </div>
               <div class="modal-body">
@@ -318,6 +473,33 @@
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="error-modal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Error</h5>
+              <button
+                id="error-modal-close"
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body" id="error-modal-body"></div>
+            <div class="modal-footer">
+              <button
+                id="error-modal-close-btn"
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

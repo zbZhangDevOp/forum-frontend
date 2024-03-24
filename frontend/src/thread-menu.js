@@ -30,20 +30,13 @@ export const threadManager = {
                     });
 
 
-                    console.log(this.threadNumber);
 
 
                     promiseChain.then(() => {
-                        if (this.threadNumber === 0 && data.length > 0) {
-                            displayThread(data[0]);
-                        }
-                        console.log("All threads loaded");
-                        console.log(this.threadNumber);
                         this.threadNumber += data.length;
                         if (callback) {
                             callback();
                         }
-                        console.log(this.threadNumber);
 
                     });
                     return data.length;
@@ -101,6 +94,7 @@ export const threadManager = {
                         threadLink.addEventListener("click", (e) => {
                             displayThread(id);
                         });
+
                     })
                 }
             })
@@ -127,7 +121,7 @@ document.getElementById("new-thread-submit").addEventListener("click", () => {
 
     const data = {
         title: title,
-        isPublic: isPublic,
+        isPublic: !isPublic,
         content: content
     };
 
@@ -145,6 +139,7 @@ document.getElementById("new-thread-submit").addEventListener("click", () => {
                 alert(data.error);
             } else {
                 loadPage("page-dashboard");
+                displayThread(data.id);
             }
         });
 });

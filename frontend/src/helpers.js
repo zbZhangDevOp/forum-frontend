@@ -24,7 +24,9 @@ export function fileToDataUrl(file) {
     const reader = new FileReader();
     const dataUrlPromise = new Promise((resolve, reject) => {
         reader.onerror = reject;
-        reader.onload = () => resolve(reader.result);
+        reader.onload = () => {
+            resolve(reader.result);
+        };
     });
     reader.readAsDataURL(file);
     return dataUrlPromise;

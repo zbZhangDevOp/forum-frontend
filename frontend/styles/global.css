@@ -16,6 +16,11 @@ li {
   list-style-type: none;
 }
 
+a {
+  color: black !important;
+  text-decoration: none !important;
+}
+
 nav {
   background-color: rgb(62, 62, 62);
 }
@@ -29,7 +34,7 @@ main {
   height: 100vh; /* or any specific height */
 }
 
-#page-register {
+.form-input {
   position: absolute;
   top: 35%;
   left: 50%;
@@ -37,19 +42,7 @@ main {
   width: 50%;
 }
 
-#page-register button {
-  float: right;
-}
-
-#page-login {
-  position: absolute;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 50%;
-}
-
-#page-login button {
+.form-input button {
   float: right;
 }
 
@@ -61,7 +54,6 @@ main {
 
 #threads-menu {
   grid-area: threads;
-  overflow-y: auto;
 }
 
 #create-thread-button {
@@ -73,7 +65,7 @@ main {
 
 #dashboard-threads {
   max-height: 90vh;
-  overflow-y: scroll; /* Makes the div scrollable */
+  overflow-y: scroll;
 }
 
 .thread-link {
@@ -93,6 +85,8 @@ main {
   display: flex;
   flex-direction: column;
   padding: 50px;
+  max-height: 95vh;
+  overflow-y: scroll;
 }
 
 #thread-head {
@@ -106,11 +100,6 @@ main {
   float: right;
   width: 100px;
 }
-
-/* #thread-head-components {
-  display: flex;
-  gap: 20px;
-} */
 
 #comments-container {
   margin-bottom: 50px;
@@ -156,6 +145,10 @@ main {
   margin-left: 20px;
 }
 
+.name-block p {
+  margin: 0;
+}
+
 /* Adjustments for the comment border links */
 
 .comment-border-link {
@@ -186,6 +179,23 @@ main {
   height: 50px;
   border-radius: 50%;
   margin-right: 20px;
+}
+
+.user-header-profile-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+#user-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+#user-header h4 {
+  margin: 0;
 }
 
 .navbar-nav {

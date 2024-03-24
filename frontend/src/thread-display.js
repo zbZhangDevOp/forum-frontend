@@ -1,10 +1,11 @@
 import { BACKEND_PORT } from './config.js';
-import { loadPage } from './main.js';
+import { validateUser, loadPage } from './main.js';
 import { postMainComment, loadComments } from './comments.js';
 
-import { validateUser } from './main.js';
 
 import { formatTimeSince } from './helpers.js';
+
+import { isAdmin, openUserModal, getUserImg, getUserName } from './user.js';
 
 export const displayThread = (id) => {
     fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
@@ -18,124 +19,194 @@ export const displayThread = (id) => {
             if (data.error) {
                 alert(data.error);
             } else {
-                const threadDiv = document.getElementById("thread");
-                threadDiv.innerText = "";
 
-                const threadHead = document.createElement("div");
-                threadHead.id = "thread-head";
+                isAdmin(validateUser.user.userId).then((isAdmin) => {
+                    getUserImg(data.creatorId).then(profilePictureUrl => {
+                        getUserName(data.creatorId).then(userName => {
+                            const threadDiv = document.getElementById("thread");
+                            threadDiv.innerText = "";
 
-                const threadHeadComponents = document.createElement("div");
-                threadHeadComponents.id = "thread-head-components";
-                threadHeadComponents.className = "btn-group";
+                            const threadHead = document.createElement("div");
+                            threadHead.id = "thread-head";
 
-                const title = document.createElement("h1");
-                title.innerText = data.title;
-                threadHead.appendChild(title);
+                            const threadHeadComponents = document.createElement("div");
+                            threadHeadComponents.id = "thread-head-components";
+                            threadHeadComponents.className = "btn-group";
 
-                const likeButton = document.createElement("button");
-                likeButton.className = "btn btn-light";
-                likeButton.id = "like-button";
-                likeButton.innerHTML = data.likes.includes(validateUser.user.userId) ? "♥ Unlike" : "♡ Like";
-                likeButton.addEventListener("click", () => {
-                    toggleLikeThread(data.lock, id);
+                            const title = document.createElement("h1");
+                            title.innerText = `${data.title}${data.lock ? " (🔒)" : ""}`;
+                            threadHead.appendChild(title);
+
+                            const likeButton = document.createElement("button");
+                            likeButton.className = "btn btn-light";
+                            likeButton.id = "like-button";
+                            likeButton.innerHTML = data.likes.includes(validateUser.user.userId) ? "♥ Unlike" : "♡ Like";
+                            likeButton.addEventListener("click", () => {
+                                toggleLikeThread(data.lock, id);
+                            });
+
+                            if (data.lock) {
+                                likeButton.disabled = true;
+                            }
+
+                            threadHeadComponents.appendChild(likeButton);
+
+
+                            const watchButton = document.createElement("button");
+                            watchButton.className = "btn btn-light";
+                            watchButton.id = "watch-button";
+                            watchButton.innerHTML = data.watchees.includes(validateUser.user.userId) ? "★ Unwatch" : "☆ Watch";
+                            watchButton.addEventListener("click", () => {
+                                toggleWatchThread(id);
+                            });
+                            threadHeadComponents.appendChild(watchButton);
+
+                            if (data.lock) {
+                                watchButton.disabled = true;
+                            }
+
+
+                            threadHead.appendChild(threadHeadComponents);
+
+                            threadDiv.appendChild(threadHead);
+
+                            const threadCreatorInfo = document.createElement("div");
+                            threadCreatorInfo.className = "comment-heading";
+
+
+                            const profilePic = document.createElement("img");
+                            profilePic.src = profilePictureUrl;
+                            profilePic.className = "img-thumbnail profile-pic";
+                            profilePic.alt = "Profile Picture";
+                            threadCreatorInfo.appendChild(profilePic);
+
+                            profilePic.onclick = function () {
+                                openUserModal(data.creatorId, data.id);
+                            };
+
+                            const nameBlock = document.createElement("div");
+                            nameBlock.className = "name-block";
+
+                            const username = document.createElement("a");
+                            username.className = "comment-username fs-5";
+                            username.innerText = userName;
+                            nameBlock.appendChild(username);
+
+                            username.onclick = function () {
+                                openUserModal(data.creatorId, data.id);
+                            };
+
+                            const time = document.createElement("p");
+                            time.className = "text-body-secondary";
+                            time.innerText = formatTimeSince(data.createdAt);
+                            nameBlock.appendChild(time);
+
+
+                            // Add number of likes
+                            const numLikes = document.createElement("p");
+                            numLikes.className = "text-body-secondary";
+                            numLikes.innerText = `Likes: ${data.likes.length}`;
+                            numLikes.id = "thread-num-likes";
+                            nameBlock.appendChild(numLikes);
+
+                            // startLikesPolling(id);
+
+                            threadCreatorInfo.appendChild(nameBlock);
+
+                            threadDiv.appendChild(threadCreatorInfo);
+
+
+
+                            const content = document.createElement("p");
+                            content.innerText = `${data.content}`;
+                            content.className = "fs-5 comment-content";
+                            threadDiv.appendChild(content);
+
+
+                            const threadModify = document.createElement("div");
+                            threadModify.id = "thread-modify";
+                            threadModify.className = "btn-group";
+
+                            const editButton = document.createElement("button");
+                            editButton.innerText = "Edit";
+                            editButton.className = "btn btn-light btn-sm";
+                            editButton.addEventListener("click", () => {
+                                openEditThreadModal(id);
+                            });
+                            threadModify.appendChild(editButton);
+
+                            if (data.lock) {
+                                editButton.disabled = true;
+                            }
+
+
+                            const deleteButton = document.createElement("button");
+                            deleteButton.innerText = "Delete";
+                            deleteButton.className = "btn btn-light btn-sm";
+                            deleteButton.addEventListener("click", () => {
+                                deleteThread(id);
+                            });
+                            threadModify.appendChild(deleteButton);
+
+
+                            if (!isAdmin && data.creatorId !== validateUser.user.userId) {
+                                threadModify.style.display = "none";
+                            }
+
+                            threadDiv.appendChild(threadModify);
+
+
+
+                            const commentDiv = document.createElement("div");
+                            commentDiv.id = "comments-container";
+
+
+                            threadDiv.appendChild(commentDiv);
+
+
+
+                            const newComment = document.createElement("div");
+                            newComment.id = "new-comment";
+                            newComment.className = "form-floating";
+
+                            const newCommentText = document.createElement("textarea");
+                            newCommentText.id = "new-comment-text";
+                            newCommentText.className = "form-control";
+                            newCommentText.placeholder = "New Comment";
+
+
+
+                            const newCommentLabel = document.createElement("label");
+                            newCommentLabel.innerText = "New Comment";
+                            newCommentLabel.for = "new-comment-text";
+
+                            const newCommentSubmit = document.createElement("button");
+                            newCommentSubmit.id = "new-comment-submit";
+                            newCommentSubmit.innerText = "Submit";
+                            newCommentSubmit.className = "btn btn-primary";
+
+                            if (data.lock) {
+                                newCommentText.disabled = true;
+                                newCommentSubmit.disabled = true;
+                            }
+
+                            newComment.appendChild(newCommentText);
+                            newComment.appendChild(newCommentLabel);
+                            newComment.appendChild(newCommentSubmit);
+
+                            newCommentSubmit.addEventListener("click", () => {
+                                postMainComment(id);
+                            });
+
+                            threadDiv.appendChild(newComment);
+
+
+
+
+                            loadComments(id);
+                        });
+                    });
                 });
-
-                threadHeadComponents.appendChild(likeButton);
-
-
-                const watchButton = document.createElement("button");
-                watchButton.className = "btn btn-light";
-                watchButton.id = "watch-button";
-                watchButton.innerHTML = data.watchees.includes(validateUser.user.userId) ? "★ Unwatch" : "☆ Watch";
-                watchButton.addEventListener("click", () => {
-                    toggleWatchThread(id);
-                });
-                threadHeadComponents.appendChild(watchButton);
-
-
-
-
-                threadHead.appendChild(threadHeadComponents);
-
-                threadDiv.appendChild(threadHead);
-
-                const likes = document.createElement("p");
-                likes.className = "text-body-secondary";
-                likes.innerText = `${formatTimeSince(data.createdAt)} | Likes: ${data.likes.length}`;
-                threadDiv.appendChild(likes);
-
-
-                const content = document.createElement("p");
-                content.innerText = `${data.content}`;
-                content.className = "fs-5 comment-content";
-                threadDiv.appendChild(content);
-
-
-                const threadModify = document.createElement("div");
-                threadModify.id = "thread-modify";
-                threadModify.className = "btn-group";
-
-                const editButton = document.createElement("button");
-                editButton.innerText = "Edit";
-                editButton.className = "btn btn-light btn-sm";
-                editButton.addEventListener("click", () => {
-                    openEditThreadModal(id);
-                });
-                threadModify.appendChild(editButton);
-
-
-                const deleteButton = document.createElement("button");
-                deleteButton.innerText = "Delete";
-                deleteButton.className = "btn btn-light btn-sm";
-                deleteButton.addEventListener("click", () => {
-                    deleteThread(id);
-                });
-                threadModify.appendChild(deleteButton);
-
-                threadDiv.appendChild(threadModify);
-
-
-
-                const commentDiv = document.createElement("div");
-                commentDiv.id = "comments-container";
-
-
-                threadDiv.appendChild(commentDiv);
-
-
-
-                const newComment = document.createElement("div");
-                newComment.id = "new-comment";
-                newComment.className = "form-floating";
-
-                const newCommentText = document.createElement("textarea");
-                newCommentText.id = "new-comment-text";
-                newCommentText.className = "form-control";
-                newCommentText.placeholder = "New Comment";
-
-                const newCommentLabel = document.createElement("label");
-                newCommentLabel.innerText = "New Comment";
-                newCommentLabel.for = "new-comment-text";
-
-                const newCommentSubmit = document.createElement("button");
-                newCommentSubmit.id = "new-comment-submit";
-                newCommentSubmit.innerText = "Submit";
-                newCommentSubmit.className = "btn btn-primary";
-
-                newComment.appendChild(newCommentText);
-                newComment.appendChild(newCommentLabel);
-                newComment.appendChild(newCommentSubmit);
-
-                newCommentSubmit.addEventListener("click", () => {
-                    postMainComment(id);
-                });
-
-                threadDiv.appendChild(newComment);
-
-
-
-
-                loadComments(id);
             }
         });
 }
@@ -163,6 +234,9 @@ const openEditThreadModal = (id) => {
                 };
 
                 document.getElementById("edit-thread-close").onclick = () => {
+                    document.getElementById("edit-thread-modal").style.display = "none";
+                };
+                document.getElementById("edit-thread-cross").onclick = () => {
                     document.getElementById("edit-thread-modal").style.display = "none";
                 };
             }
@@ -320,3 +394,48 @@ const toggleWatchThread = (id) => {
     });
 
 }
+
+export const isThreadLocked = (id) => {
+    return fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${validateUser.user.token}`
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                return data.lock;
+            }
+        })
+
+}
+
+// const updateLikes = (id) => {
+//     fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${validateUser.user.token}`
+//         }
+//     }).then(response => response.json())
+//         .then(data => {
+//             if (!data.error) {
+//                 const likeButton = document.getElementById("thread-num-likes");
+//                 likeButton.innerText = `Likes: ${data.likes.length}`;
+//             }
+//         }).catch(error => {
+//             console.error('Error updating likes:', error);
+//         });
+// };
+
+// // Call updateLikes every second for the thread with the given id
+// const startLikesPolling = (id) => {
+//     setInterval(() => {
+//         updateLikes(id);
+//         console.log("Updating likes for thread", id);
+//     }, 1000);
+// };
