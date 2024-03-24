@@ -1,6 +1,6 @@
 import { BACKEND_PORT } from './config.js';
 import { loadPage, validateUser } from './main.js';
-import { fileToDataUrl } from './helpers.js';
+import { fileToDataUrl, displayError } from './helpers.js';
 
 let user = null;
 
@@ -19,12 +19,22 @@ export const getUserImg = (userId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 if (!data.image) {
                     return "asset/default.jpg";
                 }
                 return data.image;
+            }
+        }).catch(error => {
+
+            validateUser.loadCache();
+            const cachedUserInfo = validateUser.userInfoCache[userId];
+            if (cachedUserInfo && cachedUserInfo.image) {
+                return cachedUserInfo.image;
+            } else {
+                displayError("User information is not available offline.");
+                return '';
             }
         });
 }
@@ -39,8 +49,8 @@ export const openUserModal = (userId) => {
         }
     }).then(response => response.json()).then(data => {
         if (data.error || !data) {
-            alert("Error: User not found or invalid userId.");
-            return; // Exit the function if there's an error
+            displayError("Error: User not found or invalid userId.");
+            return;
         }
 
         document.getElementById("display-user").style.display = "block";
@@ -85,12 +95,11 @@ export const fetchUserThreads = (threads = [], start = 0) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
                 return threads; // Return the threads accumulated so far in case of an error
             } else {
                 if (data.length === 0) {
                     // No more threads to load, return the accumulated threads
-                    console.log(threads);
                     return threads;
                 } else {
                     // Concatenate the newly fetched threads to the accumulated threads
@@ -99,7 +108,10 @@ export const fetchUserThreads = (threads = [], start = 0) => {
                     return fetchUserThreads(updatedThreads, start + data.length);
                 }
             }
-        });
+        }).catch(error => {
+            // console.error('Fetching threads failed:', error);
+            // return threads;
+        })
 };
 
 
@@ -127,7 +139,7 @@ const loadUserThread = (threadId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 const thread = document.createElement("div");
                 thread.className = "list-group-item list-group-item-action";
@@ -160,7 +172,7 @@ const loadUserThread = (threadId) => {
                 }).then(response => response.json())
                     .then(data => {
                         if (data.error) {
-                            alert(data.error);
+                            displayError(data.error);
                         } else {
                             const comments = document.createElement("p");
                             comments.innerText = `Comments: ${data.length}`;
@@ -187,7 +199,7 @@ const loadUserInfo = (userId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 getUserImg(userId).then(profilePictureUrl => {
                     isAdmin(validateUser.user.userId).then((admin) => {
@@ -267,9 +279,20 @@ export const getUserName = (userId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
+                validateUser.userInfoCache[userId] = data;
                 return data.name;
+            }
+        }).catch(error => {
+
+            validateUser.loadCache();
+            const cachedUserInfo = validateUser.userInfoCache[userId];
+            if (cachedUserInfo && cachedUserInfo.name) {
+                return cachedUserInfo.name;
+            } else {
+                displayError("User information is not available offline.");
+                return '';
             }
         });
 }
@@ -284,11 +307,22 @@ export const isAdmin = (userId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 return data.admin;
             }
-        });
+        }).catch(error => {
+
+            validateUser.loadCache();
+            const cachedUserInfo = validateUser.userInfoCache[userId];
+            if (cachedUserInfo && cachedUserInfo.admin) {
+                return cachedUserInfo.admin;
+            } else {
+
+                displayError("User information is not available offline.");
+                return '';
+            }
+        });;
 }
 
 export const openUserSetting = (id) => {
@@ -328,7 +362,7 @@ const saveUserChanges = () => {
         }).then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    displayError(data.error);
                 } else {
                     loadPage("page-dashboard");
                 }
@@ -340,7 +374,7 @@ const saveUserChanges = () => {
             updatedData.image = dataUrl;
             sendUpdateRequest();
         }).catch(error => {
-            console.error('Error converting file to data URL:', error);
+            displayError(error);
         });
     } else {
         sendUpdateRequest();
@@ -365,7 +399,7 @@ const updateUserAdmin = (userId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
             }
         });

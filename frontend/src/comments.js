@@ -1,8 +1,9 @@
 import { BACKEND_PORT } from './config.js';
 import { validateUser } from './main.js';
 import { getUserImg, openUserModal, isAdmin, getUserName } from './user.js';
-import { formatTimeSince } from './helpers.js';
+import { formatTimeSince, displayError } from './helpers.js';
 import { isThreadLocked } from './thread-display.js';
+import { pollCommentsUpdates } from './polling.js';
 
 let user = null;
 
@@ -21,8 +22,9 @@ export const loadComments = (threadId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
+
                 const commentsContainer = document.getElementById("comments-container");
                 commentsContainer.innerText = "";
 
@@ -30,12 +32,46 @@ export const loadComments = (threadId) => {
                 commentTitle.innerText = "Comments";
                 commentsContainer.appendChild(commentTitle);
 
+                const commentDisplay = document.createElement("div");
+                commentDisplay.id = `comments-container-${threadId}`;
+                commentsContainer.appendChild(commentDisplay);
+
+
+                if (validateUser.pollIntervalId) {
+                    clearInterval(validateUser.pollIntervalId);
+                    validateUser.pollIntervalId = null;
+                }
+
+
+                validateUser.pollIntervalId = setInterval(() => {
+                    pollCommentsUpdates(threadId);
+                }, 1000);
+
+
+
+
+                validateUser.commentListCache[threadId] = data;
+
+                data.forEach(comment => {
+                    validateUser.commentInfoCache[comment.id] = comment;
+                });
+
+
                 displayComments(data, null);
+                validateUser.setCache();
+
+            }
+        }).catch(error => {
+            validateUser.loadCache();
+            const cachedCommentData = validateUser.commentListCache[threadId];
+            if (cachedCommentData) {
+                displayComments(cachedCommentData, null);
             }
         });
 }
 
-const displayComments = (comments, parentId) => {
+export const displayComments = (comments, parentId) => {
+
     if (comments.length === 0) {
         return;
     }
@@ -47,7 +83,6 @@ const displayComments = (comments, parentId) => {
 
     const remaining = comments.filter(comment => comment.parentCommentId !== parentId);
 
-    // children.forEach(comment => {
 
     const processComment = (index) => {
         if (index >= children.length) {
@@ -60,7 +95,7 @@ const displayComments = (comments, parentId) => {
                 isAdmin(validateUser.user.userId).then(isAdmin => {
                     getUserName(comment.creatorId).then(userName => {
                         const parentElement = comment.parentCommentId != null
-                            ? document.querySelector(`#comment-${comment.parentCommentId} .nested-comments`) : document.getElementById("comments-container");
+                            ? document.querySelector(`#comment-${comment.parentCommentId} .nested-comments`) : document.getElementById(`comments-container-${comment.threadId}`);
 
 
 
@@ -79,7 +114,7 @@ const displayComments = (comments, parentId) => {
                         commentHeading.appendChild(profilePic);
 
                         profilePic.onclick = function () {
-                            openUserModal(comment.creatorId, comment.threadId);
+                            openUserModal(comment.creatorId);
                         };
 
                         const nameBlock = document.createElement("div");
@@ -91,7 +126,7 @@ const displayComments = (comments, parentId) => {
                         nameBlock.appendChild(username);
 
                         username.onclick = function () {
-                            openUserModal(comment.creatorId, comment.threadId);
+                            openUserModal(comment.creatorId);
                         };
 
                         // Add number of likes
@@ -189,7 +224,7 @@ export const postMainComment = (threadId) => {
     const commentText = document.getElementById("new-comment-text").value;
 
     if (commentText.trim() === "") {
-        alert("Comment cannot be empty!");
+        displayError("Comment cannot be empty!");
         return;
     }
 
@@ -209,12 +244,12 @@ export const postMainComment = (threadId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 if (threadId in validateUser.watchThreads) {
                     validateUser.watchThreads[threadId].add(commentText);
                 }
-                loadComments(threadId); // Reload the comments
+                // loadComments(threadId); // Reload the comments
             }
         });
 
@@ -254,11 +289,10 @@ const replyComment = (parentId, threadId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 document.getElementById("reply-modal").style.display = "none";
-                loadComments(threadId); // Reload the comments
-                console.log("???????")
+                // loadComments(threadId); // Reload the comments
                 if (threadId in validateUser.watchThreads) {
                     validateUser.watchThreads[threadId].add(commentText);
                 }
@@ -304,10 +338,10 @@ const updateComment = (commentId, threadId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 document.getElementById("edit-comment-modal").style.display = "none";
-                loadComments(threadId); // Reload the comments
+                // loadComments(threadId); // Reload the comments
             }
         });
 };
@@ -322,7 +356,7 @@ const isCommentLiked = (commentId, threadId) => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 const comment = data.find(comment => comment.id === commentId);
                 return comment.likes.includes(validateUser.user.userId);
@@ -348,15 +382,15 @@ const toggleLikeComment = (commentId, threadId) => {
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    displayError(data.error);
                 } else {
                     const likeButton = document.getElementById(`like-comment-${commentId}`);
                     likeButton.innerHTML = !isLiked ? "♥ Unlike" : "♡ Like";
-                    loadComments(threadId);
+                    // loadComments(threadId);
                 }
             })
             .catch(error => {
-                console.error('Error liking thread:', error);
+                displayError(error);
             });
     });
 

@@ -5,12 +5,12 @@ import { validateUser } from './main.js';
 import { loadPage } from './main.js';
 
 import { getUserName } from './user.js';
-import { formatTimeSince } from './helpers.js';
+import { formatTimeSince, displayError } from './helpers.js';
+
+import { pollThreadUpdates } from './polling.js';
 
 export const threadManager = {
     threadNumber: 0,
-
-
     loadThreads: function (callback) {
         return fetch(`http://localhost:${BACKEND_PORT}/threads?start=${this.threadNumber}`, {
             method: 'GET',
@@ -21,15 +21,17 @@ export const threadManager = {
         }).then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    displayError(data.error);
                 } else {
                     let promiseChain = Promise.resolve();
 
                     data.forEach(threadId => {
                         promiseChain = promiseChain.then(() => this.loadThread(threadId));
+                        setInterval(() => {
+                            pollThreadUpdates(threadId);
+                        }, 1000);
+
                     });
-
-
 
 
                     promiseChain.then(() => {
@@ -37,9 +39,36 @@ export const threadManager = {
                         if (callback) {
                             callback();
                         }
-
                     });
+                    validateUser.threadListCache.push(...data);
+
+                    validateUser.setCache();
+
                     return data.length;
+                }
+            }).catch(error => {
+                validateUser.loadCache();
+                const cachedThreads = validateUser.threadListCache;
+                if (cachedThreads && cachedThreads.length > 0) {
+                    const startIndex = this.threadNumber;
+                    const endIndex = startIndex + 5;
+                    const threadsToDisplay = cachedThreads.slice(startIndex, endIndex);
+                    let promiseChain = Promise.resolve();
+                    threadsToDisplay.forEach(threadId => {
+                        promiseChain = promiseChain.then(() => this.loadThread(threadId));
+                    });
+
+                    promiseChain.then(() => {
+                        this.threadNumber += threadsToDisplay.length;
+                        if (callback) {
+                            callback();
+                        }
+                    });
+
+                    return threadsToDisplay.length;
+                } else {
+                    displayError("No threads available offline.");
+                    return 0;
                 }
             });
     },
@@ -54,56 +83,71 @@ export const threadManager = {
         }).then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    displayError(data.error);
                 } else {
-                    return getUserName(data.creatorId).then((name) => {
-                        const threadLink = document.createElement("a");
-                        threadLink.href = "#";
-                        threadLink.className = "list-group-item list-group-item-action thread-link";
-
-                        // Add thread title
-                        const title = document.createElement("h4");
-                        title.innerText = data.title;
-                        threadLink.appendChild(title);
-
-                        const threadLinkComponents = document.createElement("div");
-                        threadLinkComponents.className = "thread-link-components";
-
-
-
-                        // Add author
-                        const author = document.createElement("p");
-                        author.innerText = `${name}`;
-                        threadLinkComponents.appendChild(author);
-
-                        // Add post date
-                        const postDate = document.createElement("p");
-                        postDate.innerText = `${formatTimeSince(data.createdAt)}`;
-                        threadLinkComponents.appendChild(postDate);
-
-                        // Add number of likes
-                        const likes = document.createElement("p");
-                        likes.innerText = `Likes: ${data.likes.length}`;
-                        threadLinkComponents.appendChild(likes);
-
-                        threadLink.appendChild(threadLinkComponents);
-
-                        // Append the thread div to the dashboard
-                        document.getElementById("dashboard-threads").appendChild(threadLink);
-
-                        threadLink.addEventListener("click", (e) => {
-                            displayThread(id);
-                        });
-
-                    })
+                    this.createThreadComponents(data, id);
+                    validateUser.threadInfoCache[id] = data;
+                }
+            }).catch(error => {
+                validateUser.loadCache();
+                const cachedThreadData = validateUser.threadInfoCache[id];
+                if (cachedThreadData) {
+                    this.createThreadComponents(cachedThreadData, id);
+                } else {
+                    displayError("No threads available offline.");
                 }
             })
+    },
+
+    createThreadComponents: function (data, id) {
+        return getUserName(data.creatorId).then((name) => {
+            const threadLink = document.createElement("a");
+            threadLink.href = "#";
+            threadLink.className = "list-group-item list-group-item-action thread-link";
+
+            // Add thread title
+            const title = document.createElement("h4");
+            title.innerText = data.title;
+            threadLink.appendChild(title);
+
+            const threadLinkComponents = document.createElement("div");
+            threadLinkComponents.className = "thread-link-components";
+
+
+
+            // Add author
+            const author = document.createElement("p");
+            author.innerText = `${name}`;
+            threadLinkComponents.appendChild(author);
+
+            // Add post date
+            const postDate = document.createElement("p");
+            postDate.innerText = `${formatTimeSince(data.createdAt)}`;
+            threadLinkComponents.appendChild(postDate);
+
+            // Add number of likes
+            const likes = document.createElement("p");
+            likes.innerText = `Likes: ${data.likes.length}`;
+            likes.id = `menu-likes-${id}`;
+            threadLinkComponents.appendChild(likes);
+
+            threadLink.appendChild(threadLinkComponents);
+
+            // Append the thread div to the dashboard
+            document.getElementById("dashboard-threads").appendChild(threadLink);
+
+            threadLink.addEventListener("click", (e) => {
+                displayThread(id);
+            });
+
+        })
     },
 
     reset: function () {
         this.threadNumber = 0;
         this.initialLoadCount = 0;
         document.getElementById("dashboard-threads").innerText = "";
+        validateUser.resetCache();
     }
 };
 
@@ -136,10 +180,12 @@ document.getElementById("new-thread-submit").addEventListener("click", () => {
     }).then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                displayError(data.error);
             } else {
                 loadPage("page-dashboard");
                 displayThread(data.id);
             }
+        }).catch(error => {
+            displayError("Failed to create thread.");
         });
 });

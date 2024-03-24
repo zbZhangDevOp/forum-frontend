@@ -49,3 +49,28 @@ export const formatTimeSince = (dateString) => {
         return `${Math.floor(diffInSeconds / 604800)} week(s) ago`;
     }
 };
+
+export const displayError = (error) => {
+    const errorElement = document.getElementById("error-modal");
+    errorElement.style.display = "block";
+
+    const errorText = document.getElementById("error-modal-body");
+
+    errorText.innerText = "";
+
+    const errorTextChild = document.createElement("p");
+    errorTextChild.innerText = error;
+
+    errorText.appendChild(errorTextChild);
+
+    const close = document.getElementById("error-modal-close");
+    close.addEventListener("click", () => {
+        errorElement.style.display = "none";
+    })
+
+    const closeBtn = document.getElementById("error-modal-close-btn");
+    closeBtn.addEventListener("click", () => {
+        errorElement.style.display = "none";
+    })
+
+}

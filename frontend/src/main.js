@@ -3,11 +3,18 @@ import { threadManager } from './thread-menu.js';
 import { openCurrentUserModal, openUserSetting, openUserModal } from './user.js';
 import { displayThread } from './thread-display.js';
 import { fetchThreadsUserIsWatching, pollForNewComments } from './watch.js';
+import { displayError } from './helpers.js';
 
 
 export const validateUser = {
     user: null,
     watchThreads: {},
+    pollIntervalId: null,
+    threadListCache: [],
+    threadInfoCache: {},
+    commentListCache: {},
+    commentInfoCache: {},
+    userInfoCache: {},
     loadUser: function () {
         if (localStorage.getItem('user') !== null) {
             this.user = JSON.parse(localStorage.getItem('user'));
@@ -17,10 +24,47 @@ export const validateUser = {
         localStorage.setItem('user', JSON.stringify(data));
         this.loadUser();
     },
+    loadCache: function () {
+        if (localStorage.getItem('threadListCache') !== null) {
+            this.threadListCache = JSON.parse(localStorage.getItem('threadListCache'));
+        }
+        if (localStorage.getItem('threadInfoCache') !== null) {
+            this.threadInfoCache = JSON.parse(localStorage.getItem('threadInfoCache'));
+        }
+        if (localStorage.getItem('commentInfoCache') !== null) {
+            this.commentInfoCache = JSON.parse(localStorage.getItem('commentInfoCache'));
+        }
+        if (localStorage.getItem('userInfoCache') !== null) {
+            this.userInfoCache = JSON.parse(localStorage.getItem('userInfoCache'));
+        }
+        if (localStorage.getItem('commentListCache') !== null) {
+            this.commentListCache = JSON.parse(localStorage.getItem('commentListCache'));
+        }
+        if (localStorage.getItem('commentInfoCache') !== null) {
+            this.commentInfoCache = JSON.parse(localStorage.getItem('commentInfoCache'));
+        }
+    },
+
+    setCache: function () {
+        localStorage.setItem('threadListCache', JSON.stringify(this.threadListCache));
+        localStorage.setItem('threadInfoCache', JSON.stringify(this.threadInfoCache));
+        localStorage.setItem('commentInfoCache', JSON.stringify(this.commentInfoCache));
+        localStorage.setItem('userInfoCache', JSON.stringify(this.userInfoCache));
+        localStorage.setItem('commentListCache', JSON.stringify(this.commentListCache));
+        localStorage.setItem('commentInfoCache', JSON.stringify(this.commentInfoCache));
+    },
     reset: function () {
         this.user = null;
         this.watchThreads = {};
         localStorage.clear()
+    },
+    resetCache: function () {
+        this.threadListCache = [];
+        this.threadInfoCache = {};
+        this.commentInfoCache = {};
+        this.userInfoCache = {};
+        this.commentListCache = {};
+        this.commentInfoCache = {};
     }
 }
 
@@ -62,31 +106,6 @@ const onLoad = () => {
     } else {
         loadPage("page-login");
     }
-}
-
-const displayError = (error) => {
-    const errorElement = document.getElementById("error-modal");
-    errorElement.style.display = "block";
-
-    const errorText = document.getElementById("error-modal-body");
-
-    errorText.innerText = "";
-
-    const errorTextChild = document.createElement("p");
-    errorTextChild.innerText = error;
-
-    errorText.appendChild(errorTextChild);
-
-    const close = document.getElementById("error-modal-close");
-    close.addEventListener("click", () => {
-        errorElement.style.display = "none";
-    })
-
-    const closeBtn = document.getElementById("error-modal-close-btn");
-    closeBtn.addEventListener("click", () => {
-        errorElement.style.display = "none";
-    })
-
 }
 
 document.getElementById("register-submit").addEventListener("click", () => {
@@ -168,6 +187,7 @@ document.getElementById("nav-dashboard").addEventListener("click", () => {
 
 document.getElementById("nav-logout").addEventListener("click", () => {
     validateUser.reset();
+    validateUser.resetCache();
     onLoad();
 })
 
@@ -204,14 +224,10 @@ document.getElementById("user-dropdown-btn").addEventListener("click", () => {
 function handleRouting() {
     const fragment = window.location.hash;
 
-    console.log(fragment);
 
-    // Matches '#thread={threadId}'
     const threadMatch = fragment.match(/#thread=(\d+)/);
     if (threadMatch) {
         const threadId = threadMatch[1];
-        console.log(threadMatch);
-        console.log(threadId);
         displayThread(threadId);
         return;
     }
@@ -230,7 +246,6 @@ function handleRouting() {
         return;
     }
 
-    // Default route (could be your home page or dashboard)
 }
 
 window.addEventListener('hashchange', handleRouting);
@@ -242,11 +257,9 @@ onLoad();
 
 Notification.requestPermission().then(perm => {
     if (perm === "granted") {
-        console.log("Notifications sadfasdf");
         new Notification("Notifications enabled");
     } else {
         new Notification("Notifications disabled");
-        console.log("Notifications disabled");
     }
 })
 
