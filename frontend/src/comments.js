@@ -48,8 +48,6 @@ export const loadComments = (threadId) => {
                 }, 1000);
 
 
-
-
                 validateUser.commentListCache[threadId] = data;
 
                 data.forEach(comment => {

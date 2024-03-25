@@ -10,6 +10,7 @@ export const validateUser = {
     user: null,
     watchThreads: {},
     pollIntervalId: null,
+    otherIntervalIds: [],
     threadListCache: [],
     threadInfoCache: {},
     commentListCache: {},
@@ -56,6 +57,17 @@ export const validateUser = {
     reset: function () {
         this.user = null;
         this.watchThreads = {};
+        if (this.pollIntervalId) {
+            clearInterval(this.pollIntervalId);
+        }
+        this.pollIntervalId = null;
+
+        for (let i = 0; i < this.otherIntervalIds.length; i++) {
+            clearInterval(this.otherIntervalIds[i]);
+        }
+
+        this.otherIntervalIds = [];
+
         localStorage.clear()
     },
     resetCache: function () {
@@ -91,9 +103,12 @@ const loadNav = () => {
     if (validateUser.user) {
         document.getElementById("nav-logged-out").style.display = "none";
         document.getElementById("nav-logged-in").style.display = "flex";
+        document.getElementById("nav-title").style.display = "flex";
     } else {
         document.getElementById("nav-logged-out").style.display = "flex";
         document.getElementById("nav-logged-in").style.display = "none";
+        document.getElementById("nav-title").style.display = "none";
+
     }
 }
 
@@ -102,13 +117,17 @@ const onLoad = () => {
     loadNav();
 
     if (validateUser.user !== null) {
+        fetchThreadsUserIsWatching();
+        const intervalId = setInterval(pollForNewComments, 1000);
+        validateUser.otherIntervalIds.push(intervalId);
         loadPage("page-dashboard");
     } else {
         loadPage("page-login");
     }
 }
 
-document.getElementById("register-submit").addEventListener("click", () => {
+document.getElementById("register-submit").addEventListener("click", (e) => {
+    e.preventDefault();
     const password = document.getElementById("register-password").value;
     const name = document.getElementById("register-name").value;
     const email = document.getElementById("register-email").value;
@@ -147,7 +166,9 @@ document.getElementById("register-submit").addEventListener("click", () => {
         });
 })
 
-document.getElementById("login-submit").addEventListener("click", () => {
+document.getElementById("login-submit").addEventListener("click", (e) => {
+    e.preventDefault();
+
     const email = document.getElementById("login-email").value;
     const password = document.getElementById("login-password").value;
     const data = {
@@ -201,6 +222,17 @@ document.getElementById("dashboard-threads").addEventListener("scroll", () => {
     }
 })
 
+document.getElementById("mobile-dashboard-threads").addEventListener("scroll", () => {
+    let div = document.getElementById("mobile-dashboard-threads");
+    let scrollTop = div.scrollTop;
+    let scrollHeight = div.scrollHeight;
+    let clientHeight = div.clientHeight;
+    if (clientHeight + scrollTop >= scrollHeight - 50) {
+        threadManager.loadThreads();
+    }
+})
+
+
 document.getElementById("user-dropdown-btn").addEventListener("click", () => {
     const dropdown = document.getElementById("user-dropdown");
     if (dropdown.style.display === "none") {
@@ -219,6 +251,12 @@ document.getElementById("user-dropdown-btn").addEventListener("click", () => {
         dropdown.style.display = "none";
         openUserSetting(validateUser.user.userId);
     })
+})
+
+document.getElementById("mobile-threads").addEventListener("click", () => {
+    let div = document.getElementById("mobile-threads-menu");
+    div.style.display = div.style.display === "none" ? "block" : "none";
+
 })
 
 function handleRouting() {
@@ -250,7 +288,6 @@ function handleRouting() {
 
 window.addEventListener('hashchange', handleRouting);
 window.addEventListener('load', handleRouting);
-window.addEventListener('load', fetchThreadsUserIsWatching);
 
 
 onLoad();
@@ -264,4 +301,3 @@ Notification.requestPermission().then(perm => {
 })
 
 
-setInterval(pollForNewComments, 1000);

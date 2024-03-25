@@ -27,9 +27,14 @@ export const threadManager = {
 
                     data.forEach(threadId => {
                         promiseChain = promiseChain.then(() => this.loadThread(threadId));
-                        setInterval(() => {
+
+
+                        const intervalId = setInterval(() => {
                             pollThreadUpdates(threadId);
                         }, 1000);
+
+                        validateUser.otherIntervalIds.push(intervalId);
+
 
                     });
 
@@ -133,13 +138,19 @@ export const threadManager = {
 
             threadLink.appendChild(threadLinkComponents);
 
+            const threadLinkClone = threadLink.cloneNode(true);
+
             // Append the thread div to the dashboard
+            document.getElementById("mobile-dashboard-threads").appendChild(threadLinkClone);
             document.getElementById("dashboard-threads").appendChild(threadLink);
 
             threadLink.addEventListener("click", (e) => {
                 displayThread(id);
             });
 
+            threadLinkClone.addEventListener("click", (e) => {
+                displayThread(id);
+            });
         })
     },
 
@@ -147,6 +158,7 @@ export const threadManager = {
         this.threadNumber = 0;
         this.initialLoadCount = 0;
         document.getElementById("dashboard-threads").innerText = "";
+        document.getElementById("mobile-dashboard-threads").innerText = "";
         validateUser.resetCache();
     }
 };
@@ -155,6 +167,10 @@ export const threadManager = {
 
 
 document.getElementById("create-thread-button").addEventListener("click", () => {
+    loadPage("page-create-thread");
+})
+
+document.getElementById("mobile-create-thread-button").addEventListener("click", () => {
     loadPage("page-create-thread");
 })
 

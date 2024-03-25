@@ -34,6 +34,12 @@ main {
   height: 100vh; /* or any specific height */
 }
 
+#nav-logged-out,
+#nav-logged-in {
+  display: flex;
+  gap: 5px;
+}
+
 .form-input {
   position: absolute;
   top: 35%;
@@ -48,12 +54,25 @@ main {
 
 #page-dashboard {
   display: inline;
+  position: relative;
   grid-template-columns: 400px auto;
   grid-template-areas: "threads thread";
 }
 
 #threads-menu {
   grid-area: threads;
+}
+
+#mobile-threads {
+  display: none;
+}
+
+#mobile-threads-menu {
+  position: absolute;
+  z-index: 10;
+  width: 273px;
+  align-items: stretch;
+  background-color: white;
 }
 
 #create-thread-button {
@@ -63,9 +82,45 @@ main {
   justify-content: center;
 }
 
-#dashboard-threads {
+#mobile-create-thread-button {
+  width: 273px;
+  justify-content: center;
+}
+
+#dashboard-threads,
+#mobile-dashboard-threads {
   max-height: 90vh;
   overflow-y: scroll;
+  width: 100%;
+}
+
+#mobile-dashboard-threads {
+  position: absolute;
+}
+
+@media (max-width: 800px) {
+  #threads-menu {
+    display: none; /* or any other display setting */
+  }
+  #mobile-dashboard-threads {
+    display: block;
+  }
+  #mobile-threads {
+    display: block;
+  }
+  #logo-div {
+    display: none !important;
+  }
+  #page-dashboard {
+    grid-template-columns: 1fr;
+    grid-template-areas: "thread";
+  }
+  .thread-link-components p {
+    font-size: 0.8rem;
+  }
+  .form-input {
+    width: 90%;
+  }
 }
 
 .thread-link {
