@@ -8,7 +8,7 @@ import { formatTimeSince, displayError } from './helpers.js';
 import { isAdmin, openUserModal, getUserImg, getUserName } from './user.js';
 
 export const displayThread = (id) => {
-    fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+    fetch(`${BACKEND_PORT}/thread?id=${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ export const createLikeUser = (userId) => {
 }
 
 const openEditThreadModal = (id) => {
-    fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+    fetch(`${BACKEND_PORT}/thread?id=${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -337,7 +337,7 @@ const saveThreadChanges = (id) => {
         lock: document.getElementById("edit-thread-locked").checked
     };
 
-    fetch(`http://localhost:${BACKEND_PORT}/thread`, {
+    fetch(`${BACKEND_PORT}/thread`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -361,7 +361,7 @@ const deleteThread = (id) => {
             id: id
         };
 
-        fetch(`http://localhost:${BACKEND_PORT}/thread`, {
+        fetch(`${BACKEND_PORT}/thread`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -380,7 +380,7 @@ const deleteThread = (id) => {
 };
 
 const isThreadLiked = (id) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+    return fetch(`${BACKEND_PORT}/thread?id=${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -408,7 +408,7 @@ const toggleLikeThread = (isLocked, id) => {
             "turnon": !isLiked
         };
 
-        fetch(`http://localhost:${BACKEND_PORT}/thread/like`, {
+        fetch(`${BACKEND_PORT}/thread/like`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -432,7 +432,7 @@ const toggleLikeThread = (isLocked, id) => {
 
 }
 const isThreadWatched = (id) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+    return fetch(`${BACKEND_PORT}/thread?id=${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -455,7 +455,7 @@ const toggleWatchThread = (id) => {
             "turnon": !isWatching
         };
 
-        fetch(`http://localhost:${BACKEND_PORT}/thread/watch`, {
+        fetch(`${BACKEND_PORT}/thread/watch`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -480,7 +480,7 @@ const toggleWatchThread = (id) => {
 }
 
 export const isThreadLocked = (id) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+    return fetch(`${BACKEND_PORT}/thread?id=${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

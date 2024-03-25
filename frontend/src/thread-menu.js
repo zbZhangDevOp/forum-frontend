@@ -12,7 +12,7 @@ import { pollThreadUpdates } from './polling.js';
 export const threadManager = {
     threadNumber: 0,
     loadThreads: function (callback) {
-        return fetch(`http://localhost:${BACKEND_PORT}/threads?start=${this.threadNumber}`, {
+        return fetch(`${BACKEND_PORT}/threads?start=${this.threadNumber}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ export const threadManager = {
     },
 
     loadThread: function (id) {
-        return fetch(`http://localhost:${BACKEND_PORT}/thread?id=${id}`, {
+        return fetch(`${BACKEND_PORT}/thread?id=${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ document.getElementById("new-thread-submit").addEventListener("click", () => {
     };
 
 
-    fetch(`http://localhost:${BACKEND_PORT}/thread`, {
+    fetch(`${BACKEND_PORT}/thread`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -13,7 +13,7 @@ if (localStorage.getItem('user') !== null) {
 }
 
 export const loadComments = (threadId) => {
-    fetch(`http://localhost:${BACKEND_PORT}/comments?threadId=${threadId}`, {
+    fetch(`${BACKEND_PORT}/comments?threadId=${threadId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -282,7 +282,7 @@ export const postMainComment = (threadId) => {
         "parentCommentId": null
     };
 
-    fetch(`http://localhost:${BACKEND_PORT}/comment`, {
+    fetch(`${BACKEND_PORT}/comment`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -327,7 +327,7 @@ const replyComment = (parentId, threadId) => {
         "parentCommentId": parentId
     };
 
-    fetch(`http://localhost:${BACKEND_PORT}/comment`, {
+    fetch(`${BACKEND_PORT}/comment`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -376,7 +376,7 @@ const updateComment = (commentId, threadId) => {
         "content": commentText
     };
 
-    fetch(`http://localhost:${BACKEND_PORT}/comment`, {
+    fetch(`${BACKEND_PORT}/comment`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -395,7 +395,7 @@ const updateComment = (commentId, threadId) => {
 };
 
 const isCommentLiked = (commentId, threadId) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/comments?threadId=${threadId}`, {
+    return fetch(`${BACKEND_PORT}/comments?threadId=${threadId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -419,7 +419,7 @@ const toggleLikeComment = (commentId, threadId) => {
             "turnon": !isLiked
         };
 
-        fetch(`http://localhost:${BACKEND_PORT}/comment/like`, {
+        fetch(`${BACKEND_PORT}/comment/like`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

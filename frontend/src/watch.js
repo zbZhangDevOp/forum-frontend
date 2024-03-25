@@ -22,7 +22,7 @@ export const fetchThreadsUserIsWatching = (userId) => {
 }
 
 const addWatchThread = (threadId) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/thread?id=${threadId}`, {
+    return fetch(`${BACKEND_PORT}/thread?id=${threadId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ const addWatchThread = (threadId) => {
 
 
 export const fetchCommentsForThread = (threadId) => {
-    fetch(`http://localhost:${BACKEND_PORT}/comments?threadId=${threadId}`, {
+    fetch(`${BACKEND_PORT}/comments?threadId=${threadId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ export const fetchCommentsForThread = (threadId) => {
 }
 
 export const fetchNewCommentsForThread = (threadId) => {
-    fetch(`http://localhost:${BACKEND_PORT}/comments?threadId=${threadId}`, {
+    fetch(`${BACKEND_PORT}/comments?threadId=${threadId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

@@ -12,7 +12,7 @@ if (localStorage.getItem('user') !== null) {
 }
 
 export const pollThreadUpdates = (threadId) => {
-    fetch(`http://localhost:${BACKEND_PORT}/thread?id=${threadId}`, {
+    fetch(`${BACKEND_PORT}/thread?id=${threadId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export const pollThreadUpdates = (threadId) => {
 }
 
 export const pollCommentsUpdates = (threadId) => {
-    fetch(`http://localhost:${BACKEND_PORT}/comments?threadId=${threadId}`, {
+    fetch(`${BACKEND_PORT}/comments?threadId=${threadId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

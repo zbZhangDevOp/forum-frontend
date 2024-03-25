@@ -10,7 +10,7 @@ if (localStorage.getItem('user') !== null) {
 }
 
 export const getUserImg = (userId) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/user?userId=${userId}`, {
+    return fetch(`${BACKEND_PORT}/user?userId=${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export const getUserImg = (userId) => {
 
 export const openUserModal = (userId) => {
 
-    fetch(`http://localhost:${BACKEND_PORT}/user?userId=${userId}`, {
+    fetch(`${BACKEND_PORT}/user?userId=${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export const openCurrentUserModal = (userId) => {
 };
 
 export const fetchUserThreads = (threads = [], start = 0) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/threads?start=${start}`, {
+    return fetch(`${BACKEND_PORT}/threads?start=${start}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ const loadUserThreads = (userId) => {
 const loadUserThread = (threadId) => {
     document.getElementById("user-threads").innerText = "";
 
-    fetch(`http://localhost:${BACKEND_PORT}/thread?id=${threadId}`, {
+    fetch(`${BACKEND_PORT}/thread?id=${threadId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ const loadUserThread = (threadId) => {
                 likes.innerText = `Likes: ${data.likes.length}`;
                 threadFooter.appendChild(likes);
 
-                fetch(`http://localhost:${BACKEND_PORT}/comments?threadId=${threadId}`, {
+                fetch(`${BACKEND_PORT}/comments?threadId=${threadId}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ const loadUserThread = (threadId) => {
 
 const loadUserInfo = (userId) => {
     document.getElementById("user-info").innerText = "";
-    fetch(`http://localhost:${BACKEND_PORT}/user?userId=${userId}`, {
+    fetch(`${BACKEND_PORT}/user?userId=${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -270,7 +270,7 @@ const loadUserInfo = (userId) => {
 }
 
 export const getUserName = (userId) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/user?userId=${userId}`, {
+    return fetch(`${BACKEND_PORT}/user?userId=${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -298,7 +298,7 @@ export const getUserName = (userId) => {
 }
 
 export const isAdmin = (userId) => {
-    return fetch(`http://localhost:${BACKEND_PORT}/user?userId=${userId}`, {
+    return fetch(`${BACKEND_PORT}/user?userId=${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -352,7 +352,7 @@ const saveUserChanges = () => {
     }
 
     const sendUpdateRequest = () => {
-        fetch(`http://localhost:${BACKEND_PORT}/user`, {
+        fetch(`${BACKEND_PORT}/user`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -389,7 +389,7 @@ const updateUserAdmin = (userId) => {
         "turnon": isAdmin
     }
 
-    fetch(`http://localhost:${BACKEND_PORT}/user/admin`, {
+    fetch(`${BACKEND_PORT}/user/admin`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

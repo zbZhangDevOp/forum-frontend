@@ -92,7 +92,7 @@ export const loadPage = (page) => {
         threadManager.reset();
 
         threadManager.loadThreads(() => {
-            threadManager.loadThreads(() => { threadManager.loadThreads(); }); // Call the second time after the first call is complete
+            threadManager.loadThreads(() => { threadManager.loadThreads(); });
         });
 
         document.getElementById(page).style.display = "grid";
@@ -149,7 +149,7 @@ document.getElementById("register-submit").addEventListener("click", (e) => {
         email: email
     };
 
-    fetch(`http://localhost:${BACKEND_PORT}/auth/register`, {
+    fetch(`${BACKEND_PORT}/auth/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -176,7 +176,7 @@ document.getElementById("login-submit").addEventListener("click", (e) => {
         password: password
     };
 
-    fetch(`http://localhost:${BACKEND_PORT}/auth/login`, {
+    fetch(`${BACKEND_PORT}/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
