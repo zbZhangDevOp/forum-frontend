@@ -2,6 +2,7 @@ import { BACKEND_PORT } from './config.js';
 import { validateUser } from './main.js';
 
 import { displayComments } from './comments.js';
+import { createLikeUser } from './thread-display.js';
 
 let user = null;
 
@@ -53,6 +54,30 @@ const updateThreadUI = (threadData, threadId) => {
     const menuLikesElement = document.getElementById(`menu-likes-${threadId}`);
     if (menuLikesElement) {
         menuLikesElement.innerText = `Likes: ${threadData.likes.length}`;
+    }
+
+    const threadLikesDropdownElement = document.getElementById(`likes-dropdown-${threadId}`);
+    if (threadLikesDropdownElement) {
+
+        threadLikesDropdownElement.innerText = "";
+
+        if (threadData.likes.length === 0) {
+            const noLikesText = document.createElement("div");
+            noLikesText.innerText = "No likes yet.";
+            noLikesText.className = "no-liked-user-link";
+
+            const noLikes = document.createElement("li");
+            noLikes.appendChild(noLikesText);
+            threadLikesDropdownElement.appendChild(noLikes);
+        }
+
+        const likeUserPromises = threadData.likes.map(userId => createLikeUser(userId));
+
+        Promise.all(likeUserPromises).then(likeUsers => {
+            likeUsers.forEach(likeUser => {
+                threadLikesDropdownElement.appendChild(likeUser);
+            });
+        })
     }
 
     const threadLikesElement = document.getElementById(`thread-likes-${threadId}`);

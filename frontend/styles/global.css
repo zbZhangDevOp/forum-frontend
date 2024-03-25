@@ -106,10 +106,26 @@ main {
   margin-top: 100px;
 }
 
-#thread-metadata {
+.thread-metadata {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.thread-metadata p {
+  margin: 0;
+}
+
+.liked-user-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.no-liked-user-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .comment-border-link {

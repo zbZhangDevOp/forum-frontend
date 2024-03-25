@@ -2,7 +2,7 @@ import { BACKEND_PORT } from './config.js';
 import { validateUser } from './main.js';
 import { getUserImg, openUserModal, isAdmin, getUserName } from './user.js';
 import { formatTimeSince, displayError } from './helpers.js';
-import { isThreadLocked } from './thread-display.js';
+import { isThreadLocked, createLikeUser } from './thread-display.js';
 import { pollCommentsUpdates } from './polling.js';
 
 let user = null;
@@ -129,11 +129,61 @@ export const displayComments = (comments, parentId) => {
                             openUserModal(comment.creatorId);
                         };
 
-                        // Add number of likes
-                        const numLikes = document.createElement("p");
+                        const metadata = document.createElement("div");
+                        metadata.className = "thread-metadata";
+
+                        const time = document.createElement("p");
+                        time.className = "text-body-secondary";
+                        time.innerText = `${formatTimeSince(comment.createdAt)} | `;
+
+                        metadata.appendChild(time);
+
+
+
+                        const likesGroup = document.createElement("div");
+                        likesGroup.className = "dropdown";
+
+
+                        const numLikes = document.createElement("a");
                         numLikes.className = "text-body-secondary";
-                        numLikes.innerText = `${formatTimeSince(comment.createdAt)} | Likes: ${comment.likes.length}`;
-                        nameBlock.appendChild(numLikes);
+                        numLikes.innerText = `Likes: ${comment.likes.length}`;
+
+                        likesGroup.appendChild(numLikes);
+
+                        const likesDropdown = document.createElement("ul");
+                        likesDropdown.className = "dropdown-menu";
+
+                        likesGroup.appendChild(likesDropdown);
+
+                        if (comment.likes.length === 0) {
+                            const noLikesText = document.createElement("div");
+                            noLikesText.innerText = "No likes yet.";
+                            noLikesText.className = "no-liked-user-link";
+
+                            const noLikes = document.createElement("li");
+                            noLikes.appendChild(noLikesText);
+                            likesDropdown.appendChild(noLikes);
+                        }
+
+                        const likeUserPromises = comment.likes.map(userId => createLikeUser(userId));
+
+                        Promise.all(likeUserPromises).then(likeUsers => {
+                            likeUsers.forEach(likeUser => {
+                                likesDropdown.appendChild(likeUser);
+                            });
+                        })
+
+                        numLikes.addEventListener("click", () => {
+                            if (likesDropdown.style.display === "block") {
+                                likesDropdown.style.display = "none";
+                            } else {
+                                likesDropdown.style.display = "block";
+                            }
+                        });
+
+                        metadata.appendChild(likesGroup);
+
+                        nameBlock.appendChild(metadata);
 
                         commentHeading.appendChild(nameBlock);
 

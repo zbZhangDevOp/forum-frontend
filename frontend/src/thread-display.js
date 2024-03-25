@@ -110,7 +110,7 @@ const createThreadDisplayComponents = (data, id) => {
                 };
 
                 const metadata = document.createElement("div");
-                metadata.id = "thread-metadata";
+                metadata.className = "thread-metadata";
 
 
                 const time = document.createElement("p");
@@ -137,14 +137,25 @@ const createThreadDisplayComponents = (data, id) => {
 
                 const likesDropdown = document.createElement("ul");
                 likesDropdown.className = "dropdown-menu";
+                likesDropdown.id = `likes-dropdown-${id}`;
 
                 likesGroup.appendChild(likesDropdown);
+
+                if (data.likes.length === 0) {
+                    const noLikesText = document.createElement("div");
+                    noLikesText.innerText = "No likes yet.";
+                    noLikesText.className = "no-liked-user-link";
+
+                    const noLikes = document.createElement("li");
+                    noLikes.appendChild(noLikesText);
+                    likesDropdown.appendChild(noLikes);
+
+                }
 
                 const likeUserPromises = data.likes.map(userId => createLikeUser(userId));
 
                 Promise.all(likeUserPromises).then(likeUsers => {
                     likeUsers.forEach(likeUser => {
-                        console.log(likeUser);
                         likesDropdown.appendChild(likeUser);
                     });
                 })
@@ -252,16 +263,25 @@ const createThreadDisplayComponents = (data, id) => {
 
 }
 
-const createLikeUser = (userId) => {
+export const createLikeUser = (userId) => {
     return getUserName(userId).then(userName => {
 
         const likeUser = document.createElement("li");
         likeUser.className = "dropdown-item";
 
         const userLink = document.createElement("a");
+        userLink.className = "liked-user-link";
+
+        const userNameText = document.createElement("div");
+        userNameText.innerText = `${userName} `;
+
+        const heart = document.createElement("div");
+        heart.innerText = "♥";
+
+        userLink.appendChild(userNameText);
+        userLink.appendChild(heart);
 
 
-        userLink.innerText = userName;
 
         userLink.onclick = () => {
             openUserModal(userId);
@@ -269,7 +289,6 @@ const createLikeUser = (userId) => {
 
         likeUser.appendChild(userLink);
 
-        console.log(likeUser)
         return likeUser;
     });
 
